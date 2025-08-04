@@ -1,10 +1,18 @@
 {
   "name": "tonyfettes/openssl",
   "version": "0.1.0",
+  "deps": {
+    "tonyfettes/c": "0.2.0",
+    "tonyfettes/uv": {
+      "path": "../uv.mbt"
+    },
+    "tonyfettes/encoding": "0.3.6"
+  },
   "readme": "README.md",
   "repository": "",
   "license": "Apache-2.0",
   "keywords": [],
   "description": "",
-  "source": "src"
+  "source": "src",
+  "--moonbit-unstable-prebuild": "build.py"
 }

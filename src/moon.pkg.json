@@ -1,1 +1,9 @@
-{}
+{
+  "import": ["tonyfettes/c"],
+  "test-import": ["tonyfettes/uv", "tonyfettes/encoding"],
+  "link": {
+    "native": {
+      "cc": "${build.CC}"
+    }
+  }
+}
