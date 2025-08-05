@@ -115,8 +115,8 @@ def openssl_is_built():
         )
     elif platform.system() == "Linux":
         return (
-            Path("vendor/lib/libssl.so").exists()
-            and Path("vendor/lib/libcrypto.so").exists()
+            Path("vendor/lib64/libssl.a").exists()
+            and Path("vendor/lib64/libcrypto.a").exists()
         )
     elif platform.system() == "Darwin":
         return (
@@ -154,17 +154,22 @@ def main():
         download_openssl()
         extract_openssl()
         build_openssl()
+    link_flags = []
+    link_libs = []
+    link_search_paths = []
     if platform.system() == "Windows":
-        link_libs = [
-            str((vendor / "lib").resolve() / "libssl"),
-            str((vendor / "lib").resolve() / "libcrypto"),
-        ]
-        link_search_paths = []
+        link_libs.append(str((vendor / "lib").resolve() / "libssl"))
+        link_libs.append(str((vendor / "lib").resolve() / "libcrypto"))
+    elif platform.system() == "Darwin":
+        link_libs.append("ssl")
+        link_libs.append("crypto")
+        link_search_paths.append(str((vendor / "lib").resolve()))
+    elif platform.system() == "Linux":
+        link_libs.append("ssl")
+        link_libs.append("crypto")
+        link_search_paths.append(str((vendor / "lib64").resolve()))
     else:
-        link_libs = ["crypto", "ssl"]
-        link_search_paths = [
-            str((vendor / "lib").resolve()),
-        ]
+        raise NotImplementedError(f"Unsupported platform: {platform.system()}")
     cc = None
     if "CC" in env:
         cc = env["CC"]
@@ -183,6 +188,7 @@ def main():
             "link_configs": [
                 {
                     "package": "tonyfettes/openssl",
+                    "link_flags": " ".join(link_flags),
                     "link_libs": link_libs,
                     "link_search_paths": link_search_paths,
                 }
