@@ -67,6 +67,7 @@ def build_openssl():
             f"--prefix={Path('vendor').resolve()}",
             f"--openssldir={Path.home() / '.moon' / 'ssl'}",
             f"no-docs",
+            f"no-shared"
         ],
         cwd=openssl_path,
         log_dir=log_dir,
