@@ -64,7 +64,7 @@ def build_openssl():
         [
             "perl",
             "Configure",
-            f"--prefix={Path('vendor/lib').resolve()}",
+            f"--prefix={Path('vendor').resolve()}",
             f"--openssldir={Path.home() / '.moon' / 'ssl'}",
             f"no-docs",
         ],
