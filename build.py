@@ -96,6 +96,26 @@ def build_openssl():
         (log_dir / "install.stderr").write_bytes(make.stderr)
 
 
+def openssl_is_built():
+    if platform.system() == "Windows":
+        return (
+            Path("vendor/lib/libssl.lib").exists()
+            and Path("vendor/lib/libcrypto.lib").exists()
+        )
+    elif platform.system() == "Linux":
+        return (
+            Path("vendor/lib/libssl.so").exists()
+            and Path("vendor/lib/libcrypto.so").exists()
+        )
+    elif platform.system() == "Darwin":
+        return (
+            Path("vendor/lib/libssl.dylib").exists()
+            and Path("vendor/lib/libcrypto.dylib").exists()
+        )
+    else:
+        raise NotImplementedError(f"Unsupported platform: {platform.system()}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build OpenSSL for MoonBit")
     parser.add_argument(
@@ -119,10 +139,7 @@ def main():
     if not moon_home.exists():
         raise FileNotFoundError(f"MOON_HOME directory {moon_home} does not exist.")
     vendor = Path("vendor")
-    if not (
-        (vendor / "lib" / "libssl.dylib").exists()
-        and (vendor / "lib" / "libcrypto.dylib").exists()
-    ):
+    if not openssl_is_built():
         download_openssl()
         extract_openssl()
         build_openssl()
