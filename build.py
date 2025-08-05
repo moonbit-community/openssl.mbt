@@ -11,7 +11,7 @@ import logging
 import argparse
 import os
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
 
 
@@ -119,10 +119,13 @@ def main():
     if not moon_home.exists():
         raise FileNotFoundError(f"MOON_HOME directory {moon_home} does not exist.")
     vendor = Path("vendor")
-    # if not (vendor / "lib" / "libssl.dylib").exists():
-    download_openssl()
-    extract_openssl()
-    build_openssl()
+    if not (
+        (vendor / "lib" / "libssl.dylib").exists()
+        and (vendor / "lib" / "libcrypto.dylib").exists()
+    ):
+        download_openssl()
+        extract_openssl()
+        build_openssl()
     link_libs = ["crypto", "ssl"]
     link_search_paths = [
         str((vendor / "lib").resolve()),
