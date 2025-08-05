@@ -140,8 +140,6 @@ test {
     }
     error => {
       println("SSL error: \{error}")
-      @openssl.Ssl::free(ssl)
-      @openssl.SslCtx::free(ctx)
       return
     }
   }
