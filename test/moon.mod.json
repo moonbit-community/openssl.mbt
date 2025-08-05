@@ -2,9 +2,7 @@
   "name": "tonyfettes/openssl/test",
   "version": "0.1.0",
   "deps": {
-    "tonyfettes/uv": {
-      "path": "../../uv.mbt"
-    },
+    "tonyfettes/uv": "0.12.0",
     "tonyfettes/openssl": {
       "path": ".."
     },
