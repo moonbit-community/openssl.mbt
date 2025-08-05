@@ -154,10 +154,17 @@ def main():
         download_openssl()
         extract_openssl()
         build_openssl()
-    link_libs = ["crypto", "ssl"]
-    link_search_paths = [
-        str((vendor / "lib").resolve()),
-    ]
+    if platform.system() == "Windows":
+        link_libs = [
+            str((vendor / "lib").resolve() / "libssl"),
+            str((vendor / "lib").resolve() / "libcrypto"),
+        ]
+        link_search_paths = []
+    else:
+        link_libs = ["crypto", "ssl"]
+        link_search_paths = [
+            str((vendor / "lib").resolve()),
+        ]
     cc = None
     if "CC" in env:
         cc = env["CC"]
