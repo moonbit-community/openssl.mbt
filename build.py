@@ -14,6 +14,7 @@ def download_openssl(version="3.5.1"):
     url = f"https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz"
     dest = Path("vendor/src/openssl-3.5.1.tar.gz")
     if not dest.exists():
+        dest.parent.mkdir(parents=True, exist_ok=True)
         urllib.request.urlretrieve(url, dest)
 
 
