@@ -15,6 +15,21 @@ logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
 
 
+def run_with_logging(cmd, cwd, log_dir, log_prefix):
+    """Run subprocess with stdout/stderr redirected to log files."""
+    stdout_path = log_dir / f"{log_prefix}.stdout"
+    stderr_path = log_dir / f"{log_prefix}.stderr"
+
+    with open(stdout_path, "w") as stdout_file, open(stderr_path, "w") as stderr_file:
+        return subprocess.run(
+            cmd,
+            cwd=cwd,
+            check=True,
+            stdout=stdout_file,
+            stderr=stderr_file,
+        )
+
+
 def download_openssl(version="3.5.1"):
     """Download OpenSSL source code."""
     url = f"https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz"
@@ -45,7 +60,7 @@ def build_openssl():
     log_dir = Path("vendor/log/openssl")
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    configure = subprocess.run(
+    run_with_logging(
         [
             "perl",
             "Configure",
@@ -54,46 +69,42 @@ def build_openssl():
             f"no-docs",
         ],
         cwd=openssl_path,
-        check=True,
-        capture_output=True,
+        log_dir=log_dir,
+        log_prefix="configure",
     )
-    (log_dir / "configure.stdout").write_bytes(configure.stdout)
-    (log_dir / "configure.stderr").write_bytes(configure.stderr)
 
     logger.info("Building OpenSSL...")
     if platform.system() == "Windows":
-        nmake = subprocess.run(
+        run_with_logging(
             ["nmake"],
             cwd=openssl_path,
-            check=True,
-            capture_output=True,
+            log_dir=log_dir,
+            log_prefix="build",
         )
-        (log_dir / "build.stdout").write_bytes(nmake.stdout)
-        (log_dir / "build.stderr").write_bytes(nmake.stderr)
     else:
         cpu_count = os.cpu_count() or 4
-        make = subprocess.run(
+        run_with_logging(
             ["make", "-j", str(cpu_count)],
             cwd=openssl_path,
-            check=True,
-            capture_output=True,
+            log_dir=log_dir,
+            log_prefix="build",
         )
-        (log_dir / "build.stdout").write_bytes(make.stdout)
-        (log_dir / "build.stderr").write_bytes(make.stderr)
 
     logger.info("Installing OpenSSL...")
     if platform.system() == "Windows":
-        nmake = subprocess.run(
-            ["nmake", "install"], cwd=openssl_path, check=True, capture_output=True
+        run_with_logging(
+            ["nmake", "install"],
+            cwd=openssl_path,
+            log_dir=log_dir,
+            log_prefix="install",
         )
-        (log_dir / "install.stdout").write_bytes(nmake.stdout)
-        (log_dir / "install.stderr").write_bytes(nmake.stderr)
     else:
-        make = subprocess.run(
-            ["make", "install"], cwd=openssl_path, check=True, capture_output=True
+        run_with_logging(
+            ["make", "install"],
+            cwd=openssl_path,
+            log_dir=log_dir,
+            log_prefix="install",
         )
-        (log_dir / "install.stdout").write_bytes(make.stdout)
-        (log_dir / "install.stderr").write_bytes(make.stderr)
 
 
 def openssl_is_built():
