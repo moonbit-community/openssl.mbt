@@ -95,6 +95,7 @@ test {
     println("Failed to initialize OpenSSL")
     return
   }
+  println("OpenSSL initialized successfully")
   let store = @openssl.X509Store::new()
   {
     let bio = @openssl.Bio::new_mem_buf(
@@ -115,15 +116,15 @@ test {
   let ctx = @openssl.SslCtx::new(method_)
   defer ctx.free()
   ctx.set_cert_store(store) |> ignore()
-  let fd = client.fileno().to_int()
-  println("Socket created with fd: \{fd}")
+  let socket = client.os_sock()
+  println("Socket created with fd: \{socket.to_int()}")
   let ssl = @openssl.Ssl::new(ctx)
   defer ssl.free()
-  let result = @openssl.Ssl::set_fd(ssl, fd)
+  let result = @openssl.Ssl::set_fd(ssl, socket.to_int())
   println("SSL set fd result: \{result}")
   let _ = @openssl.Ssl::connect(ssl)
   let written = @openssl.Ssl::write(ssl, request, request.length())
-  let poller = @uv.Poll::file(uv, @uv.File::of_int(fd))
+  let poller = @uv.Poll::socket(uv, socket)
   let errors = []
   let buffer = @buffer.new()
   match @openssl.Ssl::get_error(ssl, written) {
