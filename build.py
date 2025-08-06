@@ -215,10 +215,11 @@ def main():
         else:
             cc = "gcc"
     cc_flags = []
+    include_directory = Path("vendor/include").resolve()
     if platform.system() == "Windows":
-        cc_flags.append("/I..\\vendor\\include")
+        cc_flags.append(f"/I{include_directory}")
     else:
-        cc_flags.append("-I../vendor/include")
+        cc_flags.append(f"-I{include_directory}")
     output = json.dumps(
         {
             "vars": {
