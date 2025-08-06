@@ -89,7 +89,6 @@ test {
   uv.run(Default)
   if @openssl.init_ssl(
       @openssl.INIT_LOAD_SSL_STRINGS | @openssl.INIT_LOAD_CRYPTO_STRINGS,
-      @c.null(),
     ) !=
     1 {
     println("Failed to initialize OpenSSL")
@@ -102,13 +101,8 @@ test {
       @test.mozilla_ca_bundle,
       @test.mozilla_ca_bundle.length(),
     )
-    defer bio.free()
-    let cert = @openssl.Pem::read_bio_x509(
-      bio,
-      @c.Nullable::none(),
-      @c.null(),
-      @c.null(),
-    )
+    defer ignore(bio.free())
+    let cert = @openssl.Pem::read_bio_x509(bio)
     defer cert.free()
     store.add_cert(cert) |> ignore()
   }

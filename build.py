@@ -214,10 +214,16 @@ def main():
             cc = "clang"
         else:
             cc = "gcc"
+    cc_flags = []
+    if platform.system() == "Windows":
+        cc_flags.append("/I..\\vendor\\include")
+    else:
+        cc_flags.append("-I../vendor/include")
     output = json.dumps(
         {
             "vars": {
                 "CC": cc,
+                "CC_FLAGS": " ".join(cc_flags),
             },
             "link_configs": [
                 {
