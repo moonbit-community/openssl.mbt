@@ -3,7 +3,11 @@
 #include <string.h>
 
 #if defined(_WIN32)
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "gdi32.lib")
+#pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "crypt32.lib")
+#pragma comment(lib, "user32.lib")
 #endif
 
 MOONBIT_FFI_EXPORT

@@ -193,7 +193,6 @@ def main():
     if platform.system() == "Windows":
         link_libs.append(str((vendor / "lib").resolve() / "libssl"))
         link_libs.append(str((vendor / "lib").resolve() / "libcrypto"))
-        link_libs.append("crypt32")
     elif platform.system() == "Darwin":
         link_libs.append("ssl")
         link_libs.append("crypto")
