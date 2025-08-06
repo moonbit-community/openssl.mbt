@@ -60,19 +60,48 @@ def build_openssl():
     log_dir = Path("vendor/log/openssl")
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    run_with_logging(
-        [
-            "perl",
-            "Configure",
-            f"--prefix={Path('vendor').resolve()}",
-            f"--openssldir={Path.home() / '.moon' / 'ssl'}",
-            f"no-docs",
-            f"no-shared"
-        ],
-        cwd=openssl_path,
-        log_dir=log_dir,
-        log_prefix="configure",
-    )
+    if platform.system() == "Windows":
+        if platform.architecture()[0] == "64bit":
+            run_with_logging(
+                [
+                    "perl",
+                    "Configure",
+                    "VC-WIN64A",
+                    f"--prefix={Path('vendor').resolve()}",
+                    f"--openssldir={Path.home() / '.moon' / 'ssl'}",
+                    f"no-docs",
+                ],
+                cwd=openssl_path,
+                log_dir=log_dir,
+                log_prefix="configure",
+            )
+        else:
+            run_with_logging(
+                [
+                    "perl",
+                    "Configure",
+                    "VC-WIN32",
+                    f"--prefix={Path('vendor').resolve()}",
+                    f"--openssldir={Path.home() / '.moon' / 'ssl'}",
+                    f"no-docs",
+                ],
+                cwd=openssl_path,
+                log_dir=log_dir,
+                log_prefix="configure",
+            )
+    else:
+        run_with_logging(
+            [
+                "perl",
+                "Configure",
+                f"--prefix={Path('vendor').resolve()}",
+                f"--openssldir={Path.home() / '.moon' / 'ssl'}",
+                f"no-docs",
+            ],
+            cwd=openssl_path,
+            log_dir=log_dir,
+            log_prefix="configure",
+        )
 
     logger.info("Building OpenSSL...")
     if platform.system() == "Windows":
