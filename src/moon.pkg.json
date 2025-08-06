@@ -1,4 +1,9 @@
 {
+  "targets": {
+    "openssl.mbt": [
+      "native"
+    ]
+  },
   "link": {
     "native": {
       "stub-cc": "${build.CC}",
