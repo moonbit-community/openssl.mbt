@@ -2,6 +2,10 @@
 #include <moonbit.h>
 #include <string.h>
 
+#if defined(_WIN32)
+#pragma comment(lib, "crypt32.lib")
+#endif
+
 MOONBIT_FFI_EXPORT
 int32_t
 moonbit_OPENSSL_init_ssl(uint64_t opts) {
