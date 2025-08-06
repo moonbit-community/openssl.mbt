@@ -2,7 +2,6 @@
   "test-import": [
     "tonyfettes/uv",
     "tonyfettes/openssl",
-    "tonyfettes/encoding",
-    "tonyfettes/c"
+    "tonyfettes/encoding"
   ]
 }
