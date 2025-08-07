@@ -170,29 +170,21 @@ test {
   let ctx = @openssl.SslCtx::new(server_method)
   defer ctx.free()
   println("OpenSSL initialized successfully")
-  if ctx.use_certificate_file(
-      "server.crt",
-      @openssl.X509Filetype::Pem,
-    ) !=
-    1 {
+  if ctx.use_certificate_file("server.crt", @openssl.X509Filetype::Pem) != 1 {
     println("Failed to load server certificate")
     return
   }
   println("Loaded server certificate")
   println("Loaded server private key")
-  if ctx.use_PrivateKey_file(
-      "server.key",
-      @openssl.X509Filetype::Pem,
-    ) !=
-    1 {
+  if ctx.use_PrivateKey_file("server.key", @openssl.X509Filetype::Pem) != 1 {
     println("Failed to use server private key")
     return
   }
   println("Server private key set successfully")
   let server = @uv.Tcp::new(uv)
-  let address = @uv.ip4_addr("0.0.0.0", 8443)
+  let address = @uv.ip4_addr("0.0.0.0", 8444)
   server.bind(address, @uv.TcpBindFlags::new())
-  println("Server bound to port 8443")
+  println("Server bound to port 8444")
   server.listen(128, server => server_on_connection(server, ctx, errors), (
     _,
     error,

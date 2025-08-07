@@ -1,0 +1,78 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/openssl"
+
+// Values
+const INIT_LOAD_CRYPTO_STRINGS : UInt64 = 0x00000002
+
+const INIT_LOAD_SSL_STRINGS : UInt64 = 0x00200000
+
+fn init_ssl(UInt64) -> Int
+
+// Errors
+
+// Types and methods
+type Bio
+fn Bio::free(Self) -> Int
+fn Bio::new_mem_buf(Bytes, Int) -> Self
+
+type EvpPkey
+
+pub type Pem
+fn Pem::read_bio_PrivateKey(Bio) -> EvpPkey
+fn Pem::read_bio_x509(Bio) -> X509
+
+type Ssl
+fn Ssl::accept(Self) -> Int
+fn Ssl::connect(Self) -> Int
+fn Ssl::free(Self) -> Unit
+fn Ssl::get_error(Self, Int) -> SslError
+fn Ssl::new(SslCtx) -> Self
+fn Ssl::read(Self, Bytes, Int, Int) -> Int
+fn Ssl::set_accept_state(Self) -> Unit
+fn Ssl::set_fd(Self, Int) -> Int
+fn Ssl::write(Self, Bytes, Int, Int) -> Int
+
+type SslCtx
+fn SslCtx::free(Self) -> Unit
+fn SslCtx::new(SslMethod) -> Self
+fn SslCtx::set_cert_store(Self, X509Store) -> Unit
+fn SslCtx::use_PrivateKey(Self, EvpPkey) -> Int
+fn SslCtx::use_PrivateKey_file(Self, Bytes, X509Filetype) -> Int
+fn SslCtx::use_certificate(Self, X509) -> Int
+fn SslCtx::use_certificate_file(Self, Bytes, X509Filetype) -> Int
+
+pub enum SslError {
+  None
+  ZeroReturn
+  WantRead
+  WantWrite
+  Syscall
+  Ssl
+}
+impl Show for SslError
+
+type SslMethod
+
+pub type Tls
+fn Tls::client_method() -> SslMethod
+fn Tls::server_method() -> SslMethod
+
+type X509
+fn X509::free(Self) -> Unit
+
+pub(all) enum X509Filetype {
+  Pem
+  Asn1
+  Default
+}
+
+type X509Store
+fn X509Store::add_cert(Self, X509) -> Int
+fn X509Store::free(Self) -> Unit
+fn X509Store::new() -> Self
+
+// Type aliases
+pub typealias X509Filetype as SslFiletype
+
+// Traits
+
