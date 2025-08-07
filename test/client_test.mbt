@@ -12,7 +12,7 @@ fn on_poll(
 ) -> Unit {
   if events.is_readable() {
     let bytes = Bytes::make(4096, 0)
-    let read = ssl.read(bytes, bytes.length())
+    let read = ssl.read(bytes, 0, bytes.length())
     match ssl.get_error(read) {
       None => {
         poll.stop() catch {
@@ -33,7 +33,7 @@ fn on_poll(
       }
     }
   } else if events.is_writable() {
-    let written = ssl.write(request, request.length())
+    let written = ssl.write(request, 0, request.length())
     match ssl.get_error(written) {
       None => {
         poll.stop() catch {
@@ -117,7 +117,7 @@ test {
   let result = @openssl.Ssl::set_fd(ssl, socket.to_int())
   println("SSL set fd result: \{result}")
   let _ = @openssl.Ssl::connect(ssl)
-  let written = @openssl.Ssl::write(ssl, request, request.length())
+  let written = @openssl.Ssl::write(ssl, request, 0, request.length())
   let poller = @uv.Poll::socket(uv, socket)
   let errors = []
   let buffer = @buffer.new()

@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "deps": {
     "tonyfettes/uv": "0.12.2",
-    "tonyfettes/openssl": "0.1.0",
+    "tonyfettes/openssl": {
+      "path": ".."
+    },
     "tonyfettes/encoding": "0.3.6"
   },
   "readme": "README.md",

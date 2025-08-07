@@ -1,5 +1,7 @@
+#include "../vendor/include/openssl/err.h"
 #include "../vendor/include/openssl/ssl.h"
 #include <moonbit.h>
+#include <stdint.h>
 #include <string.h>
 
 #if defined(_WIN32)
@@ -23,6 +25,12 @@ moonbit_TLS_client_method(void) {
 }
 
 MOONBIT_FFI_EXPORT
+const SSL_METHOD *
+moonbit_TLS_server_method(void) {
+  return TLS_server_method();
+}
+
+MOONBIT_FFI_EXPORT
 SSL_CTX *
 moonbit_SSL_CTX_new(const SSL_METHOD *method) {
   return SSL_CTX_new(method);
@@ -32,6 +40,18 @@ MOONBIT_FFI_EXPORT
 void
 moonbit_SSL_CTX_set_cert_store(SSL_CTX *ctx, X509_STORE *store) {
   return SSL_CTX_set_cert_store(ctx, store);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x509) {
+  return SSL_CTX_use_certificate(ctx, x509);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey) {
+  return SSL_CTX_use_PrivateKey(ctx, pkey);
 }
 
 MOONBIT_FFI_EXPORT
@@ -60,20 +80,32 @@ moonbit_SSL_set_fd(SSL *ssl, int fd) {
 
 MOONBIT_FFI_EXPORT
 int32_t
+moonbit_SSL_accept(SSL *ssl) {
+  return SSL_accept(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+void
+moonbit_SSL_set_accept_state(SSL *ssl) {
+  return SSL_set_accept_state(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
 moonbit_SSL_connect(SSL *ssl) {
   return SSL_connect(ssl);
 }
 
 MOONBIT_FFI_EXPORT
-int
-moonbit_SSL_read(SSL *ssl, void *buf, int num) {
-  return SSL_read(ssl, buf, num);
+int32_t
+moonbit_SSL_read(SSL *ssl, uint8_t *buf, int32_t off, int32_t num) {
+  return SSL_read(ssl, buf + off, num);
 }
 
 MOONBIT_FFI_EXPORT
-int
-moonbit_SSL_write(SSL *ssl, const void *buf, int num) {
-  return SSL_write(ssl, buf, num);
+int32_t
+moonbit_SSL_write(SSL *ssl, const uint8_t *buf, int32_t off, int32_t num) {
+  return SSL_write(ssl, buf + off, num);
 }
 
 MOONBIT_FFI_EXPORT
@@ -119,6 +151,12 @@ moonbit_X509_free(X509 *x509) {
 }
 
 MOONBIT_FFI_EXPORT
+void
+moonbit_EVP_PKEY_free(EVP_PKEY *pkey) {
+  return EVP_PKEY_free(pkey);
+}
+
+MOONBIT_FFI_EXPORT
 BIO *
 moonbit_BIO_new_mem_buf(const void *buf, int len) {
   return BIO_new_mem_buf(buf, len);
@@ -134,4 +172,30 @@ MOONBIT_FFI_EXPORT
 X509 *
 moonbit_PEM_read_bio_X509(BIO *bp) {
   return PEM_read_bio_X509(bp, NULL, NULL, NULL);
+}
+
+MOONBIT_FFI_EXPORT
+EVP_PKEY *
+moonbit_PEM_read_bio_PrivateKey(BIO *bp) {
+  return PEM_read_bio_PrivateKey(bp, NULL, NULL, NULL);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_use_PrivateKey_file(
+  SSL_CTX *ctx,
+  const char *file,
+  int32_t type
+) {
+  return SSL_CTX_use_PrivateKey_file(ctx, file, type);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_use_certificate_file(
+  SSL_CTX *ctx,
+  const char *file,
+  int32_t type
+) {
+  return SSL_CTX_use_certificate_file(ctx, file, type);
 }

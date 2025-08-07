@@ -1,8 +1,6 @@
 {
   "targets": {
-    "openssl.mbt": [
-      "native"
-    ]
+    "openssl.mbt": ["native"]
   },
   "link": {
     "native": {
