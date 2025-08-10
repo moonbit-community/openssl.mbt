@@ -31,6 +31,39 @@ pub extern "c" fn SslCtx::new(method_ : SslMethod) -> SslCtx = "moonbit_SSL_CTX_
 pub extern "c" fn SslCtx::set_cert_store(ctx : SslCtx, store : X509Store) = "moonbit_SSL_CTX_set_cert_store"
 
 ///|
+struct SslVerify(Int)
+
+///|
+pub fn SslVerify::none() -> SslVerify {
+  SslVerify(0x00)
+}
+
+///|
+pub fn SslVerify::peer(
+  fail_if_no_peer_cert~ : Bool = false,
+  client_once~ : Bool = false,
+  post_handshake~ : Bool = false,
+) -> SslVerify {
+  let mut mode = 0x01
+  if fail_if_no_peer_cert {
+    mode = mode | 0x02
+  }
+  if client_once {
+    mode = mode | 0x04
+  }
+  if post_handshake {
+    mode = mode | 0x08
+  }
+  SslVerify(mode)
+}
+
+///|
+pub extern "c" fn SslCtx::set_verify(ctx : SslCtx, mode : SslVerify) = "moonbit_SSL_CTX_set_verify"
+
+///|
+pub extern "c" fn SslCtx::set_default_verify_paths(ctx : SslCtx) = "moonbit_SSL_CTX_set_default_verify_paths"
+
+///|
 pub extern "c" fn SslCtx::use_certificate(ctx : SslCtx, cert : X509) -> Int = "moonbit_SSL_CTX_use_certificate"
 
 ///|
@@ -50,7 +83,18 @@ pub extern "c" fn Ssl::new(ctx : SslCtx) -> Ssl = "moonbit_SSL_new"
 pub extern "c" fn Ssl::set_fd(self : Ssl, fd : Int) -> Int = "moonbit_SSL_set_fd"
 
 ///|
+#borrow(name)
+pub extern "c" fn Ssl::set_tlsext_host_name(self : Ssl, name : Bytes) -> Int = "moonbit_SSL_set_tlsext_host_name"
+
+///|
+#borrow(name)
+pub extern "c" fn Ssl::set1_host(self : Ssl, name : Bytes) -> Int = "moonbit_SSL_set1_host"
+
+///|
 pub extern "c" fn Ssl::set_accept_state(self : Ssl) = "moonbit_SSL_set_accept_state"
+
+///|
+pub extern "c" fn Ssl::do_handshake(self : Ssl) -> Int = "moonbit_SSL_do_handshake"
 
 ///|
 pub extern "c" fn Ssl::connect(self : Ssl) -> Int = "moonbit_SSL_connect"

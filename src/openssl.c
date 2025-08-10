@@ -55,6 +55,30 @@ moonbit_SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey) {
 }
 
 MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_set_min_proto_version(SSL_CTX *ctx, int32_t version) {
+  return SSL_CTX_set_min_proto_version(ctx, version);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_ctrl(SSL_CTX *ctx, int32_t cmd, int32_t larg, void *parg) {
+  return SSL_CTX_ctrl(ctx, cmd, larg, parg);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_set_default_verify_paths(SSL_CTX *ctx) {
+  return SSL_CTX_set_default_verify_paths(ctx);
+}
+
+MOONBIT_FFI_EXPORT
+void
+moonbit_SSL_CTX_set_verify(SSL_CTX *ctx, int32_t mode) {
+  return SSL_CTX_set_verify(ctx, mode, NULL);
+}
+
+MOONBIT_FFI_EXPORT
 void
 moonbit_SSL_CTX_free(SSL_CTX *ctx) {
   return SSL_CTX_free(ctx);
@@ -70,6 +94,30 @@ MOONBIT_FFI_EXPORT
 void
 moonbit_SSL_free(SSL *ssl) {
   return SSL_free(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_set_tlsext_host_name(SSL *ssl, const char *name) {
+  return SSL_set_tlsext_host_name(ssl, name);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_ctrl(SSL *ssl, int32_t cmd, int32_t larg, void *parg) {
+  return SSL_ctrl(ssl, cmd, larg, parg);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_do_handshake(SSL *ssl) {
+  return SSL_do_handshake(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_set1_host(SSL *ssl, const char *name) {
+  return SSL_set1_host(ssl, name);
 }
 
 MOONBIT_FFI_EXPORT
@@ -93,13 +141,21 @@ moonbit_SSL_set_accept_state(SSL *ssl) {
 MOONBIT_FFI_EXPORT
 int32_t
 moonbit_SSL_connect(SSL *ssl) {
-  return SSL_connect(ssl);
+  int32_t result = SSL_connect(ssl);
+  if (result <= 0) {
+    ERR_print_errors_fp(stderr);
+  }
+  return result;
 }
 
 MOONBIT_FFI_EXPORT
 int32_t
 moonbit_SSL_read(SSL *ssl, uint8_t *buf, int32_t off, int32_t num) {
-  return SSL_read(ssl, buf + off, num);
+  int32_t result = SSL_read(ssl, buf + off, num);
+  if (result <= 0) {
+    ERR_print_errors_fp(stderr);
+  }
+  return result;
 }
 
 MOONBIT_FFI_EXPORT
@@ -148,6 +204,12 @@ MOONBIT_FFI_EXPORT
 void
 moonbit_X509_free(X509 *x509) {
   return X509_free(x509);
+}
+
+MOONBIT_FFI_EXPORT
+const char *
+moonbit_X509_get_default_cert_file() {
+  return X509_get_default_cert_file();
 }
 
 MOONBIT_FFI_EXPORT

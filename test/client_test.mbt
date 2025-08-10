@@ -61,6 +61,37 @@ fn on_poll(
 }
 
 ///|
+fn client_poll_connect(
+  poll : @uv.Poll,
+  events : @uv.PollEvent,
+  ssl : @openssl.Ssl,
+  errors : Array[Error],
+) -> Unit {
+  if events.is_readable() || events.is_writable() {
+    match ssl.get_error(ssl.connect()) {
+      None => poll.stop() catch { error => errors.push(error) }
+      WantRead =>
+        poll.start(
+          @uv.PollEvent::readable(),
+          (_, events) => client_poll_connect(poll, events, ssl, errors),
+          (_, error) => errors.push(error),
+        ) catch {
+          error => errors.push(error)
+        }
+      WantWrite =>
+        poll.start(
+          @uv.PollEvent::writable(),
+          (_, events) => client_poll_connect(poll, events, ssl, errors),
+          (_, error) => errors.push(error),
+        ) catch {
+          error => errors.push(error)
+        }
+      error => errors.push(Failure("SSL connect error: \{error}"))
+    }
+  }
+}
+
+///|
 test {
   let uv = @uv.Loop::new()
   let host : Bytes = "www.example.com"
@@ -109,20 +140,45 @@ test {
   let method_ = @openssl.Tls::client_method()
   let ctx = @openssl.SslCtx::new(method_)
   defer ctx.free()
-  ctx.set_cert_store(store) |> ignore()
+  ctx.set_default_verify_paths()
   let socket = client.os_sock()
   println("Socket created with fd: \{socket.to_int()}")
   let ssl = @openssl.Ssl::new(ctx)
   defer ssl.free()
-  let result = @openssl.Ssl::set_fd(ssl, socket.to_int())
+  let result = ssl.set_fd(socket.to_int())
   println("SSL set fd result: \{result}")
-  let _ = @openssl.Ssl::connect(ssl)
-  let written = @openssl.Ssl::write(ssl, request, 0, request.length())
+  let result = ssl.set_tlsext_host_name(host)
+  println("SSL set TLS extension host name result: \{result}")
+  let result = ssl.set1_host(host)
+  println("SSL set 1 host result: \{result}")
   let poller = @uv.Poll::socket(uv, socket)
   let errors = []
+  match ssl.get_error(ssl.connect()) {
+    WantRead => {
+      println("SSL connect: WantRead")
+      poller.start(
+        @uv.PollEvent::readable(),
+        (_, events) => client_poll_connect(poller, events, ssl, errors),
+        (_, error) => errors.push(error),
+      )
+    }
+    WantWrite => {
+      println("SSL connect: WantRead")
+      poller.start(
+        @uv.PollEvent::writable(),
+        (_, events) => client_poll_connect(poller, events, ssl, errors),
+        (_, error) => errors.push(error),
+      )
+    }
+    error => println("SSL connect error: \{error}")
+  }
+  uv.run(Default)
+  println("SSL connect completed")
+  let written = ssl.write(request, 0, request.length())
+  println("SSL written: \{written}")
   let buffer = @buffer.new()
   match @openssl.Ssl::get_error(ssl, written) {
-    WantRead => {
+    None => {
       poller.start(
         @uv.PollEvent::readable() | @uv.PollEvent::writable(),
         (_, events) => on_poll(poller, events, client, ssl, errors, buffer),
