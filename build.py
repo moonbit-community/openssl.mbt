@@ -153,8 +153,8 @@ def openssl_is_built():
         )
     elif platform.system() == "Darwin":
         return (
-            Path("vendor/lib/libssl.dylib").exists()
-            and Path("vendor/lib/libcrypto.dylib").exists()
+            Path("vendor/lib/libssl.a").exists()
+            and Path("vendor/lib/libcrypto.a").exists()
         )
     else:
         raise NotImplementedError(f"Unsupported platform: {platform.system()}")
