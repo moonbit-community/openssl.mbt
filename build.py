@@ -10,6 +10,8 @@ import tarfile
 import logging
 import argparse
 import os
+import shutil
+import hashlib
 
 logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
@@ -30,18 +32,50 @@ def run_with_logging(cmd, cwd, log_dir, log_prefix):
         )
 
 
-def download_openssl(version="3.5.1"):
-    """Download OpenSSL source code."""
-    url = f"https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz"
-    dest = Path("vendor/src/openssl-3.5.1.tar.gz")
+def verify_openssl(version="3.5.2"):
+    """Verify OpenSSL installation."""
+    Path("vendor/src").mkdir(parents=True, exist_ok=True)
+    url = f"https://github.com/openssl/openssl/releases/download/openssl-{version}/openssl-{version}.tar.gz.sha256"
+    dest = Path(f"vendor/src/openssl-{version}.tar.gz.sha256")
+    if dest.exists():
+        if dest.is_file():
+            dest.unlink()
+        else:
+            shutil.rmtree(dest)
+    urllib.request.urlretrieve(url, dest)
+    expected_sha256sum = dest.read_text().strip()
+    dest = Path(f"vendor/src/openssl-{version}.tar.gz")
     if not dest.exists():
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(url, dest)
+        return False
+    if not dest.is_file():
+        return False
+    hash_sha256 = hashlib.sha256()
+    with open(dest, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_sha256.update(chunk)
+    actual_sha256sum = hash_sha256.hexdigest()
+    if actual_sha256sum != expected_sha256sum.split()[0]:
+        return False
+    return True
 
 
-def extract_openssl():
+def download_openssl(version="3.5.2"):
+    """Download OpenSSL source code."""
+    url = f"https://github.com/openssl/openssl/releases/download/openssl-{version}/openssl-{version}.tar.gz"
+    dest = Path(f"vendor/src/openssl-{version}.tar.gz")
+    if dest.exists():
+        if dest.is_file():
+            dest.unlink()
+        else:
+            shutil.rmtree(dest)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    urllib.request.urlretrieve(url, dest)
+    logger.info(f"Downloaded OpenSSL {version} to {dest}")
+
+
+def extract_openssl(version="3.5.2"):
     """Extract OpenSSL source code."""
-    tar_path = Path("vendor/src/openssl-3.5.1.tar.gz")
+    tar_path = Path(f"vendor/src/openssl-{version}.tar.gz")
     if not tar_path.exists():
         raise FileNotFoundError(f"OpenSSL tarball {tar_path} does not exist.")
 
@@ -49,9 +83,9 @@ def extract_openssl():
         tar.extractall(path="vendor/src")
 
 
-def build_openssl():
+def build_openssl(version="3.5.2"):
     """Build OpenSSL from source."""
-    openssl_path = Path("vendor/src/openssl-3.5.1")
+    openssl_path = Path(f"vendor/src/openssl-{version}")
     if not openssl_path.exists():
         raise FileNotFoundError(
             f"OpenSSL source directory {openssl_path} does not exist."
@@ -183,10 +217,14 @@ def main():
     if not moon_home.exists():
         raise FileNotFoundError(f"MOON_HOME directory {moon_home} does not exist.")
     vendor = Path("vendor")
+    version = "3.5.2"
+    if not verify_openssl(version=version):
+        logger.warning("Failed to verify the integrity of OpenSSL, re-downloading...")
+        download_openssl(version=version)
     if not openssl_is_built():
-        download_openssl()
-        extract_openssl()
-        build_openssl()
+        logger.info("OpenSSL is not built, extracting and building...")
+        extract_openssl(version=version)
+        build_openssl(version=version)
     link_flags = []
     link_libs = []
     link_search_paths = []
