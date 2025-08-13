@@ -7,12 +7,6 @@
   "keywords": [],
   "description": "",
   "source": "src",
-  "--moonbit-unstable-prebuild": "build.py",
-  "exclude": [
-    "test",
-    "vendor",
-    ".claude",
-    ".vscode",
-    ".moonagent"
-  ]
+  "exclude": ["test", "vendor", ".claude", ".vscode", ".moonagent"],
+  "--moonbit-unstable-prebuild": "build.py"
 }

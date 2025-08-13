@@ -215,3 +215,32 @@ pub extern "c" fn SslCtx::use_certificate_file(
   file : Bytes,
   type_ : X509Filetype,
 ) -> Int = "moonbit_SSL_CTX_use_certificate_file"
+
+///|
+#external
+type BioMethod
+
+///|
+pub extern "c" fn Bio::s_mem() -> BioMethod = "moonbit_BIO_s_mem"
+
+///|
+pub extern "c" fn Bio::new(ty : BioMethod) -> Bio = "moonbit_BIO_new"
+
+///|
+pub extern "c" fn Bio::read(
+  bio : Bio,
+  buf : Bytes,
+  off : Int,
+  len : Int,
+) -> Int = "moonbit_BIO_read"
+
+///|
+pub extern "c" fn Bio::write(
+  bio : Bio,
+  buf : Bytes,
+  off : Int,
+  len : Int,
+) -> Int = "moonbit_BIO_write"
+
+///|
+pub extern "c" fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int = "moonbit_SSL_set_bio"

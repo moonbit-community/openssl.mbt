@@ -1,6 +1,7 @@
-#include "../vendor/include/openssl/err.h"
-#include "../vendor/include/openssl/ssl.h"
 #include <moonbit.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -260,4 +261,34 @@ moonbit_SSL_CTX_use_certificate_file(
   int32_t type
 ) {
   return SSL_CTX_use_certificate_file(ctx, file, type);
+}
+
+MOONBIT_FFI_EXPORT
+const BIO_METHOD *
+moonbit_BIO_s_mem() {
+  return BIO_s_mem();
+}
+
+MOONBIT_FFI_EXPORT
+BIO *
+moonbit_BIO_new(const BIO_METHOD *type) {
+  return BIO_new(type);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_read(BIO *bio, void *buf, int32_t off, int32_t len) {
+  return BIO_read(bio, buf + off, len);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_write(BIO *bio, const void *buf, int32_t off, int32_t len) {
+  return BIO_write(bio, buf + off, len);
+}
+
+MOONBIT_FFI_EXPORT
+void
+moonbit_SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio) {
+  return SSL_set_bio(ssl, rbio, wbio);
 }
