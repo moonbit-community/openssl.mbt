@@ -1,4 +1,12 @@
 {
+  "targets": {
+    "server_test.mbt": [
+      "native"
+    ],
+    "client_test.mbt": [
+      "native"
+    ]
+  },
   "test-import": [
     "tonyfettes/uv",
     "tonyfettes/openssl",

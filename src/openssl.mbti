@@ -13,7 +13,13 @@ fn init_ssl(UInt64) -> Int
 // Types and methods
 type Bio
 fn Bio::free(Self) -> Int
+fn Bio::new(BioMethod) -> Self
 fn Bio::new_mem_buf(Bytes, Int) -> Self
+fn Bio::read(Self, Bytes, Int, Int) -> Int
+fn Bio::s_mem() -> BioMethod
+fn Bio::write(Self, Bytes, Int, Int) -> Int
+
+type BioMethod
 
 type EvpPkey
 
@@ -24,18 +30,24 @@ fn Pem::read_bio_x509(Bio) -> X509
 type Ssl
 fn Ssl::accept(Self) -> Int
 fn Ssl::connect(Self) -> Int
+fn Ssl::do_handshake(Self) -> Int
 fn Ssl::free(Self) -> Unit
 fn Ssl::get_error(Self, Int) -> SslError
 fn Ssl::new(SslCtx) -> Self
 fn Ssl::read(Self, Bytes, Int, Int) -> Int
+fn Ssl::set1_host(Self, Bytes) -> Int
 fn Ssl::set_accept_state(Self) -> Unit
+fn Ssl::set_bio(Self, Bio, Bio) -> Int
 fn Ssl::set_fd(Self, Int) -> Int
+fn Ssl::set_tlsext_host_name(Self, Bytes) -> Int
 fn Ssl::write(Self, Bytes, Int, Int) -> Int
 
 type SslCtx
 fn SslCtx::free(Self) -> Unit
 fn SslCtx::new(SslMethod) -> Self
 fn SslCtx::set_cert_store(Self, X509Store) -> Unit
+fn SslCtx::set_default_verify_paths(Self) -> Unit
+fn SslCtx::set_verify(Self, SslVerify) -> Unit
 fn SslCtx::use_PrivateKey(Self, EvpPkey) -> Int
 fn SslCtx::use_PrivateKey_file(Self, Bytes, X509Filetype) -> Int
 fn SslCtx::use_certificate(Self, X509) -> Int
@@ -52,6 +64,10 @@ pub enum SslError {
 impl Show for SslError
 
 type SslMethod
+
+type SslVerify
+fn SslVerify::none() -> Self
+fn SslVerify::peer(fail_if_no_peer_cert? : Bool, client_once? : Bool, post_handshake? : Bool) -> Self
 
 pub type Tls
 fn Tls::client_method() -> SslMethod

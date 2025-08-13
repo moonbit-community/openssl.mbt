@@ -6,7 +6,8 @@
     "tonyfettes/openssl": {
       "path": "../.."
     },
-    "tonyfettes/encoding": "0.3.6"
+    "tonyfettes/encoding": "0.3.6",
+    "moonbitlang/async": "0.2.3"
   },
   "readme": "README.md",
   "repository": "",

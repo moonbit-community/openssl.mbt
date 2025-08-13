@@ -188,7 +188,6 @@ fn client_poll_write(
       }
     }
   }
-  let a : Json = {}
 }
 
 ///|
