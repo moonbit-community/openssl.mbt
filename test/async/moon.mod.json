@@ -7,7 +7,8 @@
       "path": "../.."
     },
     "tonyfettes/encoding": "0.3.6",
-    "moonbitlang/async": "0.2.3"
+    "moonbitlang/async": "0.2.3",
+    "TheWaWaR/clap": "0.2.4"
   },
   "readme": "README.md",
   "repository": "",

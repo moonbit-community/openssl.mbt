@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/openssl/test/internal/ssl"
+
+import(
+  "moonbitlang/async/socket"
+  "moonbitlang/core/buffer"
+  "tonyfettes/openssl"
+)
+
+// Values
+
+// Errors
+
+// Types and methods
+type Ssl
+async fn Ssl::connect(Self) -> Unit raise
+fn Ssl::new(@openssl.SslCtx, @socket.TCP, host~ : Bytes) -> Self raise
+async fn Ssl::read_all(Self, @buffer.T) -> Unit raise
+async fn Ssl::write_all(Self, Bytes, Int, Int) -> Unit raise
+
+// Type aliases
+
+// Traits
+
