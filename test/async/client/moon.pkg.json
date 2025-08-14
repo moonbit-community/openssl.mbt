@@ -3,7 +3,6 @@
   "import": [
     "moonbitlang/async",
     "moonbitlang/async/socket",
-    "tonyfettes/uv",
     "tonyfettes/encoding",
     "tonyfettes/openssl",
     "tonyfettes/openssl/test/internal/ssl",
