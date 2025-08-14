@@ -93,7 +93,10 @@ pub async fn Ssl::write_all(
 pub async fn Ssl::read_all(self : Ssl, buffer : @buffer.T) -> Unit raise {
   let read = self.ssl.read(self.bytes, 0, self.bytes.length())
   match self.ssl.get_error(read) {
-    None => buffer.write_bytesview(self.bytes[:read])
+    None => {
+      buffer.write_bytesview(self.bytes[:read])
+      self.read_all(buffer)
+    }
     ZeroReturn => ()
     WantRead => {
       self.send()
