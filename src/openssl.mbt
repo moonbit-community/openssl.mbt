@@ -227,6 +227,7 @@ pub extern "c" fn Bio::s_mem() -> BioMethod = "moonbit_BIO_s_mem"
 pub extern "c" fn Bio::new(ty : BioMethod) -> Bio = "moonbit_BIO_new"
 
 ///|
+#borrow(buf)
 pub extern "c" fn Bio::read(
   bio : Bio,
   buf : Bytes,
@@ -235,6 +236,7 @@ pub extern "c" fn Bio::read(
 ) -> Int = "moonbit_BIO_read"
 
 ///|
+#borrow(buf)
 pub extern "c" fn Bio::write(
   bio : Bio,
   buf : Bytes,
@@ -256,6 +258,7 @@ pub extern "c" fn Err::get_error() -> UInt64 = "moonbit_ERR_get_error"
 pub extern "c" fn Err::peek_error() -> UInt64 = "moonbit_ERR_peek_error"
 
 ///|
+#borrow(buf)
 pub extern "c" fn Err::error_string(
   err : UInt64,
   buf : Bytes,
