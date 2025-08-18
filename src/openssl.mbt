@@ -244,3 +244,20 @@ pub extern "c" fn Bio::write(
 
 ///|
 pub extern "c" fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int = "moonbit_SSL_set_bio"
+
+///|
+#external
+pub type Err
+
+///|
+pub extern "c" fn Err::get_error() -> UInt64 = "moonbit_ERR_get_error"
+
+///|
+pub extern "c" fn Err::peek_error() -> UInt64 = "moonbit_ERR_peek_error"
+
+///|
+pub extern "c" fn Err::error_string(
+  err : UInt64,
+  buf : Bytes,
+  len : Int,
+) -> Int = "moonbit_ERR_error_string"

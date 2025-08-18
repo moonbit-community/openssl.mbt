@@ -292,3 +292,21 @@ void
 moonbit_SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio) {
   return SSL_set_bio(ssl, rbio, wbio);
 }
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_ERR_get_error(void) {
+  return ERR_get_error();
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_ERR_peek_error(void) {
+  return ERR_peek_error();
+}
+
+MOONBIT_FFI_EXPORT
+void
+moonbit_ERR_error_string_n(uint64_t e, char *buf, int32_t len) {
+  return ERR_error_string_n(e, buf, len);
+}
