@@ -61,7 +61,74 @@ pub fn SslVerify::peer(
 pub extern "c" fn SslCtx::set_verify(ctx : SslCtx, mode : SslVerify) = "moonbit_SSL_CTX_set_verify"
 
 ///|
+pub extern "c" fn SslCtx::set_min_proto_version(
+  ctx : SslCtx,
+  version : Int,
+) -> Int = "moonbit_SSL_CTX_set_min_proto_version"
+
+///|
+pub extern "c" fn SslCtx::set_max_proto_version(
+  ctx : SslCtx,
+  version : Int,
+) -> Int = "moonbit_SSL_CTX_set_max_proto_version"
+
+///|
+pub extern "c" fn SslCtx::get_min_proto_version(ctx : SslCtx) -> Int = "moonbit_SSL_CTX_get_min_proto_version"
+
+///|
+pub extern "c" fn SslCtx::get_max_proto_version(ctx : SslCtx) -> Int = "moonbit_SSL_CTX_get_max_proto_version"
+
+///|
+pub extern "c" fn Ssl::set_min_proto_version(ssl : Ssl, version : Int) -> Int = "moonbit_SSL_set_min_proto_version"
+
+///|
+pub extern "c" fn Ssl::set_max_proto_version(ssl : Ssl, version : Int) -> Int = "moonbit_SSL_set_max_proto_version"
+
+///|
+pub extern "c" fn Ssl::get_min_proto_version(ssl : Ssl) -> Int = "moonbit_SSL_get_min_proto_version"
+
+///|
+pub extern "c" fn Ssl::get_max_proto_version(ssl : Ssl) -> Int = "moonbit_SSL_get_max_proto_version"
+
+///|
+pub extern "c" fn SslCtx::set_options(ctx : SslCtx, options : UInt64) -> UInt64 = "moonbit_SSL_CTX_set_options"
+
+///|
+pub extern "c" fn SslCtx::clear_options(
+  ctx : SslCtx,
+  options : UInt64,
+) -> UInt64 = "moonbit_SSL_CTX_clear_options"
+
+///|
+pub extern "c" fn SslCtx::get_options(ctx : SslCtx) -> UInt64 = "moonbit_SSL_CTX_get_options"
+
+///|
+pub extern "c" fn Ssl::set_options(ssl : Ssl, options : UInt64) -> UInt64 = "moonbit_SSL_set_options"
+
+///|
+pub extern "c" fn Ssl::clear_options(ssl : Ssl, options : UInt64) -> UInt64 = "moonbit_SSL_clear_options"
+
+///|
+pub extern "c" fn Ssl::get_options(ssl : Ssl) -> UInt64 = "moonbit_SSL_get_options"
+
+///|
 pub extern "c" fn SslCtx::set_default_verify_paths(ctx : SslCtx) = "moonbit_SSL_CTX_set_default_verify_paths"
+
+///|
+#borrow(str)
+pub extern "c" fn SslCtx::set_cipher_list(ctx : SslCtx, str : Bytes) -> Int = "moonbit_SSL_CTX_set_cipher_list"
+
+///|
+#borrow(str)
+pub extern "c" fn Ssl::set_cipher_list(ssl : Ssl, str : Bytes) -> Int = "moonbit_SSL_set_cipher_list"
+
+///|
+#borrow(str)
+pub extern "c" fn SslCtx::set_ciphersuites(ctx : SslCtx, str : Bytes) -> Int = "moonbit_SSL_CTX_set_ciphersuites"
+
+///|
+#borrow(str)
+pub extern "c" fn Ssl::set_ciphersuites(ssl : Ssl, str : Bytes) -> Int = "moonbit_SSL_set_ciphersuites"
 
 ///|
 pub extern "c" fn SslCtx::use_certificate(ctx : SslCtx, cert : X509) -> Int = "moonbit_SSL_CTX_use_certificate"
@@ -101,6 +168,9 @@ pub extern "c" fn Ssl::connect(self : Ssl) -> Int = "moonbit_SSL_connect"
 
 ///|
 pub extern "c" fn Ssl::accept(self : Ssl) -> Int = "moonbit_SSL_accept"
+
+///|
+pub extern "c" fn Ssl::shutdown(self : Ssl) -> Int = "moonbit_SSL_shutdown"
 
 ///|
 pub extern "c" fn Ssl::free(self : Ssl) = "moonbit_SSL_free"
@@ -147,6 +217,49 @@ fn init {
 pub extern "c" fn Ssl::get_error(ssl : Ssl, ret : Int) -> SslError = "moonbit_SSL_get_error"
 
 ///|
+pub extern "c" fn Ssl::get_version(ssl : Ssl) -> Bytes = "moonbit_SSL_get_version"
+
+///|
+pub extern "c" fn Ssl::version(ssl : Ssl) -> Int = "moonbit_SSL_version"
+
+///|
+pub extern "c" fn Ssl::client_version(ssl : Ssl) -> Int = "moonbit_SSL_client_version"
+
+///|
+pub extern "c" fn Ssl::get0_peer_certificate(ssl : Ssl) -> X509? = "moonbit_SSL_get0_peer_certificate"
+
+///|
+pub extern "c" fn Ssl::get1_peer_certificate(ssl : Ssl) -> X509? = "moonbit_SSL_get1_peer_certificate"
+
+///|
+pub extern "c" fn Ssl::get_verify_result(ssl : Ssl) -> Int64 = "moonbit_SSL_get_verify_result"
+
+///|
+// X509 Verification Result Constants
+pub const X509_V_OK : Int64 = 0L
+
+///|
+pub const X509_V_ERR_UNSPECIFIED : Int64 = 1L
+
+///|
+pub const X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT : Int64 = 2L
+
+///|
+pub const X509_V_ERR_UNABLE_TO_GET_CRL : Int64 = 3L
+
+///|
+pub const X509_V_ERR_UNABLE_TO_DECRYPT_CERT_SIGNATURE : Int64 = 4L
+
+///|
+pub const X509_V_ERR_CERT_SIGNATURE_FAILURE : Int64 = 7L
+
+///|
+pub const X509_V_ERR_CERT_NOT_YET_VALID : Int64 = 9L
+
+///|
+pub const X509_V_ERR_CERT_HAS_EXPIRED : Int64 = 10L
+
+///|
 #external
 type X509Store
 
@@ -159,6 +272,16 @@ type X509
 
 ///|
 pub extern "c" fn X509::free(cert : X509) = "moonbit_X509_free"
+
+///|
+#external
+type X509Name
+
+///|
+pub extern "c" fn X509::get_subject_name(cert : X509) -> X509Name = "moonbit_X509_get_subject_name"
+
+///|
+pub extern "c" fn X509::get_issuer_name(cert : X509) -> X509Name = "moonbit_X509_get_issuer_name"
 
 ///|
 pub type Pem
@@ -189,6 +312,9 @@ type EvpPkey
 
 ///|
 pub extern "c" fn Pem::read_bio_PrivateKey(bio : Bio) -> EvpPkey = "moonbit_PEM_read_bio_PrivateKey"
+
+///|
+pub extern "c" fn EvpPkey::free(pkey : EvpPkey) = "moonbit_EVP_PKEY_free"
 
 ///|
 pub(all) enum X509Filetype {
@@ -248,6 +374,35 @@ pub extern "c" fn Bio::write(
 pub extern "c" fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int = "moonbit_SSL_set_bio"
 
 ///|
+pub extern "c" fn Bio::pending(bio : Bio) -> Int = "moonbit_BIO_pending"
+
+///|
+pub extern "c" fn Bio::wpending(bio : Bio) -> Int = "moonbit_BIO_wpending"
+
+///|
+pub extern "c" fn Bio::ctrl_pending(bio : Bio) -> UInt64 = "moonbit_BIO_ctrl_pending"
+
+///|
+pub extern "c" fn Bio::ctrl_wpending(bio : Bio) -> UInt64 = "moonbit_BIO_ctrl_wpending"
+
+///|
+pub extern "c" fn Bio::reset(bio : Bio) -> Int = "moonbit_BIO_reset"
+
+///|
+pub extern "c" fn Bio::flush(bio : Bio) -> Int = "moonbit_BIO_flush"
+
+///|
+pub extern "c" fn Bio::eof(bio : Bio) -> Int = "moonbit_BIO_eof"
+
+///|
+pub extern "c" fn Bio::ctrl(
+  bio : Bio,
+  cmd : Int,
+  larg : Int64,
+  parg : Bytes?,
+) -> Int64 = "moonbit_BIO_ctrl"
+
+///|
 #external
 pub type Err
 
@@ -259,8 +414,133 @@ pub extern "c" fn Err::peek_error() -> UInt64 = "moonbit_ERR_peek_error"
 
 ///|
 #borrow(buf)
-pub extern "c" fn Err::error_string(
-  err : UInt64,
-  buf : Bytes,
-  len : Int,
-) -> Int = "moonbit_ERR_error_string"
+pub extern "c" fn Err::error_string_n(err : UInt64, buf : Bytes, len : Int) = "moonbit_ERR_error_string_n"
+
+///|
+// SSL Protocol Version Constants
+pub const SSL3_VERSION : Int = 0x0300
+
+///|
+pub const TLS1_VERSION : Int = 0x0301
+
+///|
+pub const TLS1_1_VERSION : Int = 0x0302
+
+///|
+pub const TLS1_2_VERSION : Int = 0x0303
+
+///|
+pub const TLS1_3_VERSION : Int = 0x0304
+
+///|
+pub const DTLS1_VERSION : Int = 0xFEFF
+
+///|
+pub const DTLS1_2_VERSION : Int = 0xFEFD
+
+///|
+pub const DTLS1_BAD_VER : Int = 0x0100
+
+///|
+// SSL Option Constants (based on SSL_OP_BIT macros)
+pub const SSL_OP_NO_EXTENDED_MASTER_SECRET : UInt64 = 0x1UL // SSL_OP_BIT(0)
+
+///|
+pub const SSL_OP_CLEANSE_PLAINTEXT : UInt64 = 0x2UL // SSL_OP_BIT(1)
+
+///|
+pub const SSL_OP_LEGACY_SERVER_CONNECT : UInt64 = 0x4UL // SSL_OP_BIT(2)
+
+///|
+pub const SSL_OP_ENABLE_KTLS : UInt64 = 0x8UL // SSL_OP_BIT(3)
+
+///|
+pub const SSL_OP_TLSEXT_PADDING : UInt64 = 0x10UL // SSL_OP_BIT(4)
+
+///|
+pub const SSL_OP_SAFARI_ECDHE_ECDSA_BUG : UInt64 = 0x40UL // SSL_OP_BIT(6)
+
+///|
+pub const SSL_OP_IGNORE_UNEXPECTED_EOF : UInt64 = 0x80UL // SSL_OP_BIT(7)
+
+///|
+pub const SSL_OP_ALLOW_CLIENT_RENEGOTIATION : UInt64 = 0x100UL // SSL_OP_BIT(8)
+
+///|
+pub const SSL_OP_DISABLE_TLSEXT_CA_NAMES : UInt64 = 0x200UL // SSL_OP_BIT(9)
+
+///|
+pub const SSL_OP_ALLOW_NO_DHE_KEX : UInt64 = 0x400UL // SSL_OP_BIT(10)
+
+///|
+pub const SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS : UInt64 = 0x800UL // SSL_OP_BIT(11)
+
+///|
+pub const SSL_OP_NO_QUERY_MTU : UInt64 = 0x1000UL // SSL_OP_BIT(12)
+
+///|
+pub const SSL_OP_COOKIE_EXCHANGE : UInt64 = 0x2000UL // SSL_OP_BIT(13)
+
+///|
+pub const SSL_OP_NO_TICKET : UInt64 = 0x4000UL // SSL_OP_BIT(14)
+
+///|
+pub const SSL_OP_CISCO_ANYCONNECT : UInt64 = 0x8000UL // SSL_OP_BIT(15)
+
+///|
+pub const SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION : UInt64 = 0x10000UL // SSL_OP_BIT(16)
+
+///|
+pub const SSL_OP_NO_COMPRESSION : UInt64 = 0x20000UL // SSL_OP_BIT(17)
+
+///|
+pub const SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION : UInt64 = 0x40000UL // SSL_OP_BIT(18)
+
+///|
+pub const SSL_OP_NO_ENCRYPT_THEN_MAC : UInt64 = 0x80000UL // SSL_OP_BIT(19)
+
+///|
+pub const SSL_OP_ENABLE_MIDDLEBOX_COMPAT : UInt64 = 0x100000UL // SSL_OP_BIT(20)
+
+///|
+pub const SSL_OP_PRIORITIZE_CHACHA : UInt64 = 0x200000UL // SSL_OP_BIT(21)
+
+///|
+pub const SSL_OP_CIPHER_SERVER_PREFERENCE : UInt64 = 0x400000UL // SSL_OP_BIT(22)
+
+///|
+pub const SSL_OP_TLS_ROLLBACK_BUG : UInt64 = 0x800000UL // SSL_OP_BIT(23)
+
+///|
+pub const SSL_OP_NO_ANTI_REPLAY : UInt64 = 0x1000000UL // SSL_OP_BIT(24)
+
+///|
+pub const SSL_OP_NO_RENEGOTIATION : UInt64 = 0x40000000UL // SSL_OP_BIT(30)
+
+///|
+pub const SSL_OP_CRYPTOPRO_TLSEXT_BUG : UInt64 = 0x80000000UL // SSL_OP_BIT(31)
+
+///|
+pub const SSL_OP_NO_SSLv3 : UInt64 = 0x2000000UL // SSL_OP_BIT(25)
+
+///|
+pub const SSL_OP_NO_TLSv1 : UInt64 = 0x4000000UL // SSL_OP_BIT(26)
+
+///|
+pub const SSL_OP_NO_TLSv1_1 : UInt64 = 0x10000000UL // SSL_OP_BIT(28)
+
+///|
+pub const SSL_OP_NO_TLSv1_2 : UInt64 = 0x8000000UL // SSL_OP_BIT(27)
+
+///|
+pub const SSL_OP_NO_TLSv1_3 : UInt64 = 0x20000000UL // SSL_OP_BIT(29)
+
+///|
+pub const SSL_OP_NO_DTLSv1 : UInt64 = 0x4000000UL // SSL_OP_BIT(26)
+
+///|
+pub const SSL_OP_NO_DTLSv1_2 : UInt64 = 0x8000000UL // SSL_OP_BIT(27)
+
+///|
+// Combined SSL_OP_ALL constant (based on OpenSSL definition)
+pub const SSL_OP_ALL : UInt64 = 0x80000850UL // SSL_OP_CRYPTOPRO_TLSEXT_BUG | SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS | SSL_OP_TLSEXT_PADDING | SSL_OP_SAFARI_ECDHE_ECDSA_BUG

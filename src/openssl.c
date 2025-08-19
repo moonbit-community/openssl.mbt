@@ -63,6 +63,144 @@ moonbit_SSL_CTX_set_min_proto_version(SSL_CTX *ctx, int32_t version) {
 
 MOONBIT_FFI_EXPORT
 int32_t
+moonbit_SSL_CTX_set_max_proto_version(SSL_CTX *ctx, int32_t version) {
+  return SSL_CTX_set_max_proto_version(ctx, version);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_get_min_proto_version(SSL_CTX *ctx) {
+  return SSL_CTX_get_min_proto_version(ctx);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_get_max_proto_version(SSL_CTX *ctx) {
+  return SSL_CTX_get_max_proto_version(ctx);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_set_min_proto_version(SSL *ssl, int32_t version) {
+  return SSL_set_min_proto_version(ssl, version);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_set_max_proto_version(SSL *ssl, int32_t version) {
+  return SSL_set_max_proto_version(ssl, version);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_get_min_proto_version(SSL *ssl) {
+  return SSL_get_min_proto_version(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_get_max_proto_version(SSL *ssl) {
+  return SSL_get_max_proto_version(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+X509_NAME *
+moonbit_X509_get_subject_name(const X509 *cert) {
+  return X509_get_subject_name(cert);
+}
+
+MOONBIT_FFI_EXPORT
+X509_NAME *
+moonbit_X509_get_issuer_name(const X509 *cert) {
+  return X509_get_issuer_name(cert);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_SSL_CTX_set_options(SSL_CTX *ctx, uint64_t options) {
+  return SSL_CTX_set_options(ctx, options);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t options) {
+  return SSL_CTX_clear_options(ctx, options);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_SSL_CTX_get_options(const SSL_CTX *ctx) {
+  return SSL_CTX_get_options(ctx);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_SSL_set_options(SSL *ssl, uint64_t options) {
+  return SSL_set_options(ssl, options);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_SSL_clear_options(SSL *ssl, uint64_t options) {
+  return SSL_clear_options(ssl, options);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_SSL_get_options(const SSL *ssl) {
+  return SSL_get_options(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_pending(BIO *bio) {
+  return BIO_pending(bio);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_wpending(BIO *bio) {
+  return BIO_wpending(bio);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_BIO_ctrl_pending(BIO *bio) {
+  return BIO_ctrl_pending(bio);
+}
+
+MOONBIT_FFI_EXPORT
+uint64_t
+moonbit_BIO_ctrl_wpending(BIO *bio) {
+  return BIO_ctrl_wpending(bio);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_reset(BIO *bio) {
+  return BIO_reset(bio);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_flush(BIO *bio) {
+  return BIO_flush(bio);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_eof(BIO *bio) {
+  return BIO_eof(bio);
+}
+
+MOONBIT_FFI_EXPORT
+int64_t
+moonbit_BIO_ctrl(BIO *bio, int32_t cmd, int64_t larg, void *parg) {
+  return BIO_ctrl(bio, cmd, larg, parg);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
 moonbit_SSL_CTX_ctrl(SSL_CTX *ctx, int32_t cmd, int32_t larg, void *parg) {
   return SSL_CTX_ctrl(ctx, cmd, larg, parg);
 }
@@ -309,4 +447,64 @@ MOONBIT_FFI_EXPORT
 void
 moonbit_ERR_error_string_n(uint64_t e, char *buf, int32_t len) {
   return ERR_error_string_n(e, buf, len);
+}
+
+MOONBIT_FFI_EXPORT
+const char *
+moonbit_SSL_get_version(const SSL *ssl) {
+  return SSL_get_version(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_version(const SSL *ssl) {
+  return SSL_version(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_client_version(const SSL *ssl) {
+  return SSL_client_version(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+X509 *
+moonbit_SSL_get0_peer_certificate(const SSL *ssl) {
+  return SSL_get0_peer_certificate(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+X509 *
+moonbit_SSL_get1_peer_certificate(const SSL *ssl) {
+  return SSL_get1_peer_certificate(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int64_t
+moonbit_SSL_get_verify_result(const SSL *ssl) {
+  return SSL_get_verify_result(ssl);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *str) {
+  return SSL_CTX_set_cipher_list(ctx, str);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_set_cipher_list(SSL *ssl, const char *str) {
+  return SSL_set_cipher_list(ssl, str);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str) {
+  return SSL_CTX_set_ciphersuites(ctx, str);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_SSL_set_ciphersuites(SSL *ssl, const char *str) {
+  return SSL_set_ciphersuites(ssl, str);
 }

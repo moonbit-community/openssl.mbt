@@ -2,9 +2,109 @@
 package "tonyfettes/openssl"
 
 // Values
+const DTLS1_2_VERSION : Int = 0xFEFD
+
+const DTLS1_BAD_VER : Int = 0x0100
+
+const DTLS1_VERSION : Int = 0xFEFF
+
 const INIT_LOAD_CRYPTO_STRINGS : UInt64 = 0x00000002
 
 const INIT_LOAD_SSL_STRINGS : UInt64 = 0x00200000
+
+const SSL3_VERSION : Int = 0x0300
+
+const SSL_OP_ALL : UInt64 = 0x80000850
+
+const SSL_OP_ALLOW_CLIENT_RENEGOTIATION : UInt64 = 0x100
+
+const SSL_OP_ALLOW_NO_DHE_KEX : UInt64 = 0x400
+
+const SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION : UInt64 = 0x40000
+
+const SSL_OP_CIPHER_SERVER_PREFERENCE : UInt64 = 0x400000
+
+const SSL_OP_CISCO_ANYCONNECT : UInt64 = 0x8000
+
+const SSL_OP_CLEANSE_PLAINTEXT : UInt64 = 0x2
+
+const SSL_OP_COOKIE_EXCHANGE : UInt64 = 0x2000
+
+const SSL_OP_CRYPTOPRO_TLSEXT_BUG : UInt64 = 0x80000000
+
+const SSL_OP_DISABLE_TLSEXT_CA_NAMES : UInt64 = 0x200
+
+const SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS : UInt64 = 0x800
+
+const SSL_OP_ENABLE_KTLS : UInt64 = 0x8
+
+const SSL_OP_ENABLE_MIDDLEBOX_COMPAT : UInt64 = 0x100000
+
+const SSL_OP_IGNORE_UNEXPECTED_EOF : UInt64 = 0x80
+
+const SSL_OP_LEGACY_SERVER_CONNECT : UInt64 = 0x4
+
+const SSL_OP_NO_ANTI_REPLAY : UInt64 = 0x1000000
+
+const SSL_OP_NO_COMPRESSION : UInt64 = 0x20000
+
+const SSL_OP_NO_DTLSv1 : UInt64 = 0x4000000
+
+const SSL_OP_NO_DTLSv1_2 : UInt64 = 0x8000000
+
+const SSL_OP_NO_ENCRYPT_THEN_MAC : UInt64 = 0x80000
+
+const SSL_OP_NO_EXTENDED_MASTER_SECRET : UInt64 = 0x1
+
+const SSL_OP_NO_QUERY_MTU : UInt64 = 0x1000
+
+const SSL_OP_NO_RENEGOTIATION : UInt64 = 0x40000000
+
+const SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION : UInt64 = 0x10000
+
+const SSL_OP_NO_SSLv3 : UInt64 = 0x2000000
+
+const SSL_OP_NO_TICKET : UInt64 = 0x4000
+
+const SSL_OP_NO_TLSv1 : UInt64 = 0x4000000
+
+const SSL_OP_NO_TLSv1_1 : UInt64 = 0x10000000
+
+const SSL_OP_NO_TLSv1_2 : UInt64 = 0x8000000
+
+const SSL_OP_NO_TLSv1_3 : UInt64 = 0x20000000
+
+const SSL_OP_PRIORITIZE_CHACHA : UInt64 = 0x200000
+
+const SSL_OP_SAFARI_ECDHE_ECDSA_BUG : UInt64 = 0x40
+
+const SSL_OP_TLSEXT_PADDING : UInt64 = 0x10
+
+const SSL_OP_TLS_ROLLBACK_BUG : UInt64 = 0x800000
+
+const TLS1_1_VERSION : Int = 0x0302
+
+const TLS1_2_VERSION : Int = 0x0303
+
+const TLS1_3_VERSION : Int = 0x0304
+
+const TLS1_VERSION : Int = 0x0301
+
+const X509_V_ERR_CERT_HAS_EXPIRED : Int64 = 10
+
+const X509_V_ERR_CERT_NOT_YET_VALID : Int64 = 9
+
+const X509_V_ERR_CERT_SIGNATURE_FAILURE : Int64 = 7
+
+const X509_V_ERR_UNABLE_TO_DECRYPT_CERT_SIGNATURE : Int64 = 4
+
+const X509_V_ERR_UNABLE_TO_GET_CRL : Int64 = 3
+
+const X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT : Int64 = 2
+
+const X509_V_ERR_UNSPECIFIED : Int64 = 1
+
+const X509_V_OK : Int64 = 0
 
 fn init_ssl(UInt64) -> Int
 
@@ -12,16 +112,31 @@ fn init_ssl(UInt64) -> Int
 
 // Types and methods
 type Bio
+fn Bio::ctrl(Self, Int, Int64, Bytes?) -> Int64
+fn Bio::ctrl_pending(Self) -> UInt64
+fn Bio::ctrl_wpending(Self) -> UInt64
+fn Bio::eof(Self) -> Int
+fn Bio::flush(Self) -> Int
 fn Bio::free(Self) -> Int
 fn Bio::new(BioMethod) -> Self
 fn Bio::new_mem_buf(Bytes, Int) -> Self
+fn Bio::pending(Self) -> Int
 fn Bio::read(Self, Bytes, Int, Int) -> Int
+fn Bio::reset(Self) -> Int
 fn Bio::s_mem() -> BioMethod
+fn Bio::wpending(Self) -> Int
 fn Bio::write(Self, Bytes, Int, Int) -> Int
 
 type BioMethod
 
+#external
+pub type Err
+fn Err::error_string_n(UInt64, Bytes, Int) -> Unit
+fn Err::get_error() -> UInt64
+fn Err::peek_error() -> UInt64
+
 type EvpPkey
+fn EvpPkey::free(Self) -> Unit
 
 pub type Pem
 fn Pem::read_bio_PrivateKey(Bio) -> EvpPkey
@@ -29,24 +144,49 @@ fn Pem::read_bio_x509(Bio) -> X509
 
 type Ssl
 fn Ssl::accept(Self) -> Int
+fn Ssl::clear_options(Self, UInt64) -> UInt64
+fn Ssl::client_version(Self) -> Int
 fn Ssl::connect(Self) -> Int
 fn Ssl::do_handshake(Self) -> Int
 fn Ssl::free(Self) -> Unit
+fn Ssl::get0_peer_certificate(Self) -> X509?
+fn Ssl::get1_peer_certificate(Self) -> X509?
 fn Ssl::get_error(Self, Int) -> SslError
+fn Ssl::get_max_proto_version(Self) -> Int
+fn Ssl::get_min_proto_version(Self) -> Int
+fn Ssl::get_options(Self) -> UInt64
+fn Ssl::get_verify_result(Self) -> Int64
+fn Ssl::get_version(Self) -> Bytes
 fn Ssl::new(SslCtx) -> Self
 fn Ssl::read(Self, Bytes, Int, Int) -> Int
 fn Ssl::set1_host(Self, Bytes) -> Int
 fn Ssl::set_accept_state(Self) -> Unit
 fn Ssl::set_bio(Self, Bio, Bio) -> Int
+fn Ssl::set_cipher_list(Self, Bytes) -> Int
+fn Ssl::set_ciphersuites(Self, Bytes) -> Int
 fn Ssl::set_fd(Self, Int) -> Int
+fn Ssl::set_max_proto_version(Self, Int) -> Int
+fn Ssl::set_min_proto_version(Self, Int) -> Int
+fn Ssl::set_options(Self, UInt64) -> UInt64
 fn Ssl::set_tlsext_host_name(Self, Bytes) -> Int
+fn Ssl::shutdown(Self) -> Int
+fn Ssl::version(Self) -> Int
 fn Ssl::write(Self, Bytes, Int, Int) -> Int
 
 type SslCtx
+fn SslCtx::clear_options(Self, UInt64) -> UInt64
 fn SslCtx::free(Self) -> Unit
+fn SslCtx::get_max_proto_version(Self) -> Int
+fn SslCtx::get_min_proto_version(Self) -> Int
+fn SslCtx::get_options(Self) -> UInt64
 fn SslCtx::new(SslMethod) -> Self
 fn SslCtx::set_cert_store(Self, X509Store) -> Unit
+fn SslCtx::set_cipher_list(Self, Bytes) -> Int
+fn SslCtx::set_ciphersuites(Self, Bytes) -> Int
 fn SslCtx::set_default_verify_paths(Self) -> Unit
+fn SslCtx::set_max_proto_version(Self, Int) -> Int
+fn SslCtx::set_min_proto_version(Self, Int) -> Int
+fn SslCtx::set_options(Self, UInt64) -> UInt64
 fn SslCtx::set_verify(Self, SslVerify) -> Unit
 fn SslCtx::use_PrivateKey(Self, EvpPkey) -> Int
 fn SslCtx::use_PrivateKey_file(Self, Bytes, X509Filetype) -> Int
@@ -75,12 +215,16 @@ fn Tls::server_method() -> SslMethod
 
 type X509
 fn X509::free(Self) -> Unit
+fn X509::get_issuer_name(Self) -> X509Name
+fn X509::get_subject_name(Self) -> X509Name
 
 pub(all) enum X509Filetype {
   Pem
   Asn1
   Default
 }
+
+type X509Name
 
 type X509Store
 fn X509Store::add_cert(Self, X509) -> Int
