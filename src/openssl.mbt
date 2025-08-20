@@ -375,6 +375,16 @@ pub extern "c" fn Bio::read(
 ) -> Int = "moonbit_BIO_read"
 
 ///|
+#borrow(data, readbytes)
+pub extern "c" fn Bio::read_ex(
+  bio : Bio,
+  data : Bytes,
+  offset : UInt64,
+  length : UInt64,
+  readbytes : Ref[UInt64],
+) -> Int = "moonbit_BIO_read_ex"
+
+///|
 #borrow(buf)
 pub extern "c" fn Bio::write(
   bio : Bio,
@@ -382,6 +392,16 @@ pub extern "c" fn Bio::write(
   off : Int,
   len : Int,
 ) -> Int = "moonbit_BIO_write"
+
+///|
+#borrow(data, written)
+pub extern "c" fn Bio::write_ex(
+  bio : Bio,
+  data : Bytes,
+  offset : UInt64,
+  length : UInt64,
+  written : Ref[UInt64],
+) -> Int = "moonbit_BIO_write_ex"
 
 ///|
 pub extern "c" fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int = "moonbit_SSL_set_bio"

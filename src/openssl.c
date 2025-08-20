@@ -193,8 +193,6 @@ moonbit_BIO_eof(BIO *bio) {
   return BIO_eof(bio);
 }
 
-
-
 MOONBIT_FFI_EXPORT
 int32_t
 moonbit_SSL_CTX_ctrl(SSL_CTX *ctx, int32_t cmd, int32_t larg, void *parg) {
@@ -417,8 +415,38 @@ moonbit_BIO_read(BIO *bio, void *buf, int32_t off, int32_t len) {
 
 MOONBIT_FFI_EXPORT
 int32_t
+moonbit_BIO_read_ex(
+  BIO *bio,
+  void *data,
+  uint64_t offset,
+  uint64_t length,
+  uint64_t *readbytes
+) {
+  size_t readbytes_sz = 0;
+  int32_t result = BIO_read_ex(bio, data + offset, length, &readbytes_sz);
+  *readbytes = readbytes_sz;
+  return result;
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
 moonbit_BIO_write(BIO *bio, const void *buf, int32_t off, int32_t len) {
   return BIO_write(bio, buf + off, len);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_write_ex(
+  BIO *bio,
+  const void *buf,
+  uint64_t offset,
+  uint64_t length,
+  uint64_t *written
+) {
+  size_t written_sz = 0;
+  int32_t result = BIO_write_ex(bio, buf + offset, length, &written_sz);
+  *written = written_sz;
+  return result;
 }
 
 MOONBIT_FFI_EXPORT
