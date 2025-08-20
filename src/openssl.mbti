@@ -112,7 +112,6 @@ fn init_ssl(UInt64) -> Int
 
 // Types and methods
 type Bio
-fn Bio::ctrl(Self, Int, Int64, Bytes?) -> Int64
 fn Bio::ctrl_pending(Self) -> UInt64
 fn Bio::ctrl_wpending(Self) -> UInt64
 fn Bio::eof(Self) -> Int

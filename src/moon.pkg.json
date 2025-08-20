@@ -8,5 +8,10 @@
       "stub-cc-flags": "${build.CC_FLAGS}"
     }
   },
-  "native-stub": ["openssl.c"]
+  "native-stub": [
+    "openssl.c"
+  ],
+  "import": [
+    "tonyfettes/c"
+  ]
 }

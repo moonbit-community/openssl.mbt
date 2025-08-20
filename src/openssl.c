@@ -193,11 +193,7 @@ moonbit_BIO_eof(BIO *bio) {
   return BIO_eof(bio);
 }
 
-MOONBIT_FFI_EXPORT
-int64_t
-moonbit_BIO_ctrl(BIO *bio, int32_t cmd, int64_t larg, void *parg) {
-  return BIO_ctrl(bio, cmd, larg, parg);
-}
+
 
 MOONBIT_FFI_EXPORT
 int32_t

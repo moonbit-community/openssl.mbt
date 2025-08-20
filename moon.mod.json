@@ -1,12 +1,22 @@
 {
   "name": "tonyfettes/openssl",
   "version": "0.2.3",
+  "deps": {
+    "tonyfettes/c": "0.2.0"
+  },
   "readme": "README.md",
   "repository": "",
   "license": "Apache-2.0",
   "keywords": [],
   "description": "",
   "source": "src",
-  "exclude": ["test", "vendor", ".claude", ".vscode", ".moonagent", ".env"],
+  "exclude": [
+    "test",
+    "vendor",
+    ".claude",
+    ".vscode",
+    ".moonagent",
+    ".env"
+  ],
   "--moonbit-unstable-prebuild": "build.py"
 }

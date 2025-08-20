@@ -217,7 +217,20 @@ fn init {
 pub extern "c" fn Ssl::get_error(ssl : Ssl, ret : Int) -> SslError = "moonbit_SSL_get_error"
 
 ///|
-pub extern "c" fn Ssl::get_version(ssl : Ssl) -> Bytes = "moonbit_SSL_get_version"
+extern "c" fn moonbit_SSL_get_version(ssl : Ssl) -> @c.Pointer[Byte] = "moonbit_SSL_get_version"
+
+///|
+pub fn Ssl::get_version(ssl : Ssl) -> Bytes {
+  let ptr = moonbit_SSL_get_version(ssl)
+  if ptr.is_null() {
+    return ""
+  }
+  let buffer = @buffer.new()
+  for i = 0; ptr[i] != 0; i = i + 1 {
+    buffer.write_byte(ptr[i])
+  }
+  buffer.contents()
+}
 
 ///|
 pub extern "c" fn Ssl::version(ssl : Ssl) -> Int = "moonbit_SSL_version"
@@ -393,14 +406,6 @@ pub extern "c" fn Bio::flush(bio : Bio) -> Int = "moonbit_BIO_flush"
 
 ///|
 pub extern "c" fn Bio::eof(bio : Bio) -> Int = "moonbit_BIO_eof"
-
-///|
-pub extern "c" fn Bio::ctrl(
-  bio : Bio,
-  cmd : Int,
-  larg : Int64,
-  parg : Bytes?,
-) -> Int64 = "moonbit_BIO_ctrl"
 
 ///|
 #external
