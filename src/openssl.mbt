@@ -428,6 +428,15 @@ pub extern "c" fn Bio::flush(bio : Bio) -> Int = "moonbit_BIO_flush"
 pub extern "c" fn Bio::eof(bio : Bio) -> Int = "moonbit_BIO_eof"
 
 ///|
+pub extern "c" fn Bio::set_tfo(bio : Bio, onoff : Int) -> Int = "moonbit_BIO_set_tfo"
+
+///|
+pub extern "c" fn Bio::get_conn_mode(bio : Bio) -> Int = "moonbit_BIO_get_conn_mode"
+
+///|
+pub extern "c" fn Bio::set_conn_mode(bio : Bio, mode : Int) -> Int = "moonbit_BIO_set_conn_mode"
+
+///|
 #external
 pub type Err
 
@@ -569,3 +578,24 @@ pub const SSL_OP_NO_DTLSv1_2 : UInt64 = 0x8000000UL // SSL_OP_BIT(27)
 ///|
 // Combined SSL_OP_ALL constant (based on OpenSSL definition)
 pub const SSL_OP_ALL : UInt64 = 0x80000850UL // SSL_OP_CRYPTOPRO_TLSEXT_BUG | SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS | SSL_OP_TLSEXT_PADDING | SSL_OP_SAFARI_ECDHE_ECDSA_BUG
+
+///|
+// BIO Socket Connection Mode Constants
+pub const BIO_SOCK_REUSEADDR : Int = 0x01
+
+///|
+pub const BIO_SOCK_V6_ONLY : Int = 0x02
+
+///|
+pub const BIO_SOCK_KEEPALIVE : Int = 0x04
+
+///|
+pub const BIO_SOCK_NONBLOCK : Int = 0x08
+
+///|
+pub const BIO_SOCK_NODELAY : Int = 0x10
+
+///|
+pub const BIO_SOCK_TFO : Int = 0x20
+
+

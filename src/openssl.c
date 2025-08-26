@@ -532,3 +532,23 @@ int32_t
 moonbit_SSL_set_ciphersuites(SSL *ssl, const char *str) {
   return SSL_set_ciphersuites(ssl, str);
 }
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_set_tfo(BIO *bio, int32_t onoff) {
+  return BIO_set_tfo(bio, onoff);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_get_conn_mode(BIO *bio) {
+  return BIO_get_conn_mode(bio);
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_BIO_set_conn_mode(BIO *bio, int32_t mode) {
+  return BIO_set_conn_mode(bio, mode);
+}
+
+

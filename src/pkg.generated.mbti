@@ -2,6 +2,18 @@
 package "tonyfettes/openssl"
 
 // Values
+const BIO_SOCK_KEEPALIVE : Int = 0x04
+
+const BIO_SOCK_NODELAY : Int = 0x10
+
+const BIO_SOCK_NONBLOCK : Int = 0x08
+
+const BIO_SOCK_REUSEADDR : Int = 0x01
+
+const BIO_SOCK_TFO : Int = 0x20
+
+const BIO_SOCK_V6_ONLY : Int = 0x02
+
 const DTLS1_2_VERSION : Int = 0xFEFD
 
 const DTLS1_BAD_VER : Int = 0x0100
@@ -117,14 +129,19 @@ fn Bio::ctrl_wpending(Self) -> UInt64
 fn Bio::eof(Self) -> Int
 fn Bio::flush(Self) -> Int
 fn Bio::free(Self) -> Int
+fn Bio::get_conn_mode(Self) -> Int
 fn Bio::new(BioMethod) -> Self
 fn Bio::new_mem_buf(Bytes, Int) -> Self
 fn Bio::pending(Self) -> Int
 fn Bio::read(Self, Bytes, Int, Int) -> Int
+fn Bio::read_ex(Self, Bytes, UInt64, UInt64, Ref[UInt64]) -> Int
 fn Bio::reset(Self) -> Int
 fn Bio::s_mem() -> BioMethod
+fn Bio::set_conn_mode(Self, Int) -> Int
+fn Bio::set_tfo(Self, Int) -> Int
 fn Bio::wpending(Self) -> Int
 fn Bio::write(Self, Bytes, Int, Int) -> Int
+fn Bio::write_ex(Self, Bytes, UInt64, UInt64, Ref[UInt64]) -> Int
 
 type BioMethod
 
