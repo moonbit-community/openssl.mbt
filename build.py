@@ -218,10 +218,10 @@ def main():
         raise FileNotFoundError(f"MOON_HOME directory {moon_home} does not exist.")
     vendor = Path("vendor")
     version = "3.5.2"
-    if not verify_openssl(version=version):
-        logger.warning("Failed to verify the integrity of OpenSSL, re-downloading...")
-        download_openssl(version=version)
     if not openssl_is_built():
+        if not verify_openssl(version=version):
+            logger.warning("Failed to verify the integrity of OpenSSL, re-downloading...")
+            download_openssl(version=version)
         logger.info("OpenSSL is not built, extracting and building...")
         extract_openssl(version=version)
         build_openssl(version=version)
