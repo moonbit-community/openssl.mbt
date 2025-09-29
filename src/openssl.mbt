@@ -40,9 +40,9 @@ pub fn SslVerify::none() -> SslVerify {
 
 ///|
 pub fn SslVerify::peer(
-  fail_if_no_peer_cert~ : Bool = false,
-  client_once~ : Bool = false,
-  post_handshake~ : Bool = false,
+  fail_if_no_peer_cert? : Bool = false,
+  client_once? : Bool = false,
+  post_handshake? : Bool = false,
 ) -> SslVerify {
   let mut mode = 0x01
   if fail_if_no_peer_cert {
@@ -597,5 +597,3 @@ pub const BIO_SOCK_NODELAY : Int = 0x10
 
 ///|
 pub const BIO_SOCK_TFO : Int = 0x20
-
-

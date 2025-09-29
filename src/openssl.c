@@ -550,5 +550,3 @@ int32_t
 moonbit_BIO_set_conn_mode(BIO *bio, int32_t mode) {
   return BIO_set_conn_mode(bio, mode);
 }
-
-
