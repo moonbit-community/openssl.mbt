@@ -12,6 +12,7 @@
     "openssl.c"
   ],
   "import": [
-    "tonyfettes/c"
+    "tonyfettes/c",
+    "moonbitlang/core/buffer"
   ]
 }

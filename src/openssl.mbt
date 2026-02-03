@@ -330,14 +330,12 @@ pub extern "c" fn Pem::read_bio_PrivateKey(bio : Bio) -> EvpPkey = "moonbit_PEM_
 pub extern "c" fn EvpPkey::free(pkey : EvpPkey) = "moonbit_EVP_PKEY_free"
 
 ///|
+#alias(SslFiletype)
 pub(all) enum X509Filetype {
   Pem = 1
   Asn1 = 2
   Default = 3
 }
-
-///|
-pub typealias X509Filetype as SslFiletype
 
 ///|
 #borrow(file)
