@@ -9,25 +9,27 @@ fn client_poll_read(
   errors : Array[Error],
 ) -> Unit {
   let bytes = Bytes::make(4096, 0)
-  let read = match (try? ssl.read(bytes, 0, bytes.length())) {
-    Ok(read) => read
-    Err(error) => {
+  let read = try ssl.read(bytes, 0, bytes.length()) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
       }
       return
     }
+  } noraise {
+    value => value
   }
-  let ssl_error = match (try? ssl.get_error(read)) {
-    Ok(value) => value
-    Err(error) => {
+  let ssl_error = try ssl.get_error(read) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
       }
       return
     }
+  } noraise {
+    value => value
   }
   match ssl_error {
     None => {
@@ -67,19 +69,21 @@ fn client_poll_connect(
   ssl : @openssl.Ssl,
   errors : Array[Error],
 ) -> Unit {
-  let connect_result = match (try? ssl.connect()) {
-    Ok(result) => result
-    Err(error) => {
+  let connect_result = try ssl.connect() catch {
+    error => {
       errors.push(error)
       return
     }
+  } noraise {
+    value => value
   }
-  let ssl_error = match (try? ssl.get_error(connect_result)) {
-    Ok(value) => value
-    Err(error) => {
+  let ssl_error = try ssl.get_error(connect_result) catch {
+    error => {
       errors.push(error)
       return
     }
+  } noraise {
+    value => value
   }
   match ssl_error {
     None => {
@@ -206,27 +210,28 @@ fn client_poll_write(
   buf : BytesView,
   errors : Array[Error],
 ) -> Unit {
-  let written = match
-    (try? ssl.write(buf.data(), buf.start_offset(), buf.length())) {
-    Ok(value) => value
-    Err(error) => {
+  let written = try ssl.write(buf.data(), buf.start_offset(), buf.length()) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
       }
       return
     }
+  } noraise {
+    value => value
   }
   println("SSL write: \{written}")
-  let ssl_error = match (try? ssl.get_error(written)) {
-    Ok(value) => value
-    Err(error) => {
+  let ssl_error = try ssl.get_error(written) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
       }
       return
     }
+  } noraise {
+    value => value
   }
   match ssl_error {
     None if written == buf.length() =>

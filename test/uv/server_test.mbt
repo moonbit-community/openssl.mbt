@@ -16,10 +16,22 @@ fn server_write(
   if !events.is_writable() {
     return
   }
-  let written = match
-    (try? ssl.write(bytes.data(), bytes.start_offset(), bytes.length())) {
-    Ok(value) => value
-    Err(error) => {
+  let written = try ssl.write(bytes.data(), bytes.start_offset(), bytes.length())
+    catch {
+      error => {
+        errors.push(error)
+        poll.stop() catch {
+          e => errors.push(e)
+        }
+        poll.close(() => ())
+        tcp.close(() => ())
+        return
+      }
+    } noraise {
+      value => value
+    }
+  let ssl_error = try ssl.get_error(written) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
@@ -28,18 +40,8 @@ fn server_write(
       tcp.close(() => ())
       return
     }
-  }
-  let ssl_error = match (try? ssl.get_error(written)) {
-    Ok(value) => value
-    Err(error) => {
-      errors.push(error)
-      poll.stop() catch {
-        e => errors.push(e)
-      }
-      poll.close(() => ())
-      tcp.close(() => ())
-      return
-    }
+  } noraise {
+    value => value
   }
   match ssl_error {
     None => {
@@ -72,9 +74,8 @@ fn server_read(
     return
   }
   let bytes = Bytes::make(4096, 0)
-  let read = match (try? ssl.read(bytes, 0, bytes.length())) {
-    Ok(value) => value
-    Err(error) => {
+  let read = try ssl.read(bytes, 0, bytes.length()) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
@@ -82,10 +83,11 @@ fn server_read(
       poll.close(() => ())
       return
     }
+  } noraise {
+    value => value
   }
-  let ssl_error = match (try? ssl.get_error(read)) {
-    Ok(value) => value
-    Err(error) => {
+  let ssl_error = try ssl.get_error(read) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
@@ -93,6 +95,8 @@ fn server_read(
       poll.close(() => ())
       return
     }
+  } noraise {
+    value => value
   }
   match ssl_error {
     None => {
@@ -125,9 +129,8 @@ fn server_accept(
   ssl : @openssl.Ssl,
   errors : Array[Error],
 ) -> Unit {
-  let accept_result = match (try? ssl.accept()) {
-    Ok(value) => value
-    Err(error) => {
+  let accept_result = try ssl.accept() catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
@@ -136,10 +139,11 @@ fn server_accept(
       tcp.close(() => ())
       return
     }
+  } noraise {
+    value => value
   }
-  let ssl_error = match (try? ssl.get_error(accept_result)) {
-    Ok(value) => value
-    Err(error) => {
+  let ssl_error = try ssl.get_error(accept_result) catch {
+    error => {
       errors.push(error)
       poll.stop() catch {
         e => errors.push(e)
@@ -148,6 +152,8 @@ fn server_accept(
       tcp.close(() => ())
       return
     }
+  } noraise {
+    value => value
   }
   match ssl_error {
     None =>
