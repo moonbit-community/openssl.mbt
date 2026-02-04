@@ -40,7 +40,10 @@ pub fn SslCtx::new(method_ : SslMethod) -> SslCtx raise OpenSslError {
 }
 
 ///|
-pub fn SslCtx::set_cert_store(ctx : SslCtx, store : X509Store) -> Unit raise OpenSslError {
+pub fn SslCtx::set_cert_store(
+  ctx : SslCtx,
+  store : X509Store,
+) -> Unit raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_ctx_set_cert_store)(ctx, store)
 }
@@ -73,11 +76,28 @@ pub fn SslVerify::peer(
 }
 
 ///|
-pub fn SslCtx::set_verify(ctx : SslCtx, mode : SslVerify) -> Unit raise OpenSslError {
+pub fn SslCtx::set_verify(
+  ctx : SslCtx,
+  mode : SslVerify,
+) -> Unit raise OpenSslError {
   let api = ensure_openssl()
   let SslVerify(value) = mode
   (api.ssl_ctx_set_verify)(ctx, value)
 }
+
+// SSL_CTRL constants for protocol version control (from OpenSSL ssl.h)
+
+///|
+let ssl_ctrl_set_min_proto_version : Int = 123
+
+///|
+let ssl_ctrl_set_max_proto_version : Int = 124
+
+///|
+let ssl_ctrl_get_min_proto_version : Int = 130
+
+///|
+let ssl_ctrl_get_max_proto_version : Int = 131
 
 ///|
 pub fn SslCtx::set_min_proto_version(
@@ -85,7 +105,12 @@ pub fn SslCtx::set_min_proto_version(
   version : Int,
 ) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_ctx_set_min_proto_version)(ctx, version)
+  (api.ssl_ctx_ctrl)(
+    ctx,
+    ssl_ctrl_set_min_proto_version,
+    version.to_int64(),
+    @c.null(),
+  ).to_int()
 }
 
 ///|
@@ -94,47 +119,71 @@ pub fn SslCtx::set_max_proto_version(
   version : Int,
 ) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_ctx_set_max_proto_version)(ctx, version)
+  (api.ssl_ctx_ctrl)(
+    ctx,
+    ssl_ctrl_set_max_proto_version,
+    version.to_int64(),
+    @c.null(),
+  ).to_int()
 }
 
 ///|
 pub fn SslCtx::get_min_proto_version(ctx : SslCtx) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_ctx_get_min_proto_version)(ctx)
+  (api.ssl_ctx_ctrl)(ctx, ssl_ctrl_get_min_proto_version, 0L, @c.null()).to_int()
 }
 
 ///|
 pub fn SslCtx::get_max_proto_version(ctx : SslCtx) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_ctx_get_max_proto_version)(ctx)
+  (api.ssl_ctx_ctrl)(ctx, ssl_ctrl_get_max_proto_version, 0L, @c.null()).to_int()
 }
 
 ///|
-pub fn Ssl::set_min_proto_version(ssl : Ssl, version : Int) -> Int raise OpenSslError {
+pub fn Ssl::set_min_proto_version(
+  ssl : Ssl,
+  version : Int,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_set_min_proto_version)(ssl, version)
+  (api.ssl_ctrl)(
+    ssl,
+    ssl_ctrl_set_min_proto_version,
+    version.to_int64(),
+    @c.null(),
+  ).to_int()
 }
 
 ///|
-pub fn Ssl::set_max_proto_version(ssl : Ssl, version : Int) -> Int raise OpenSslError {
+pub fn Ssl::set_max_proto_version(
+  ssl : Ssl,
+  version : Int,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_set_max_proto_version)(ssl, version)
+  (api.ssl_ctrl)(
+    ssl,
+    ssl_ctrl_set_max_proto_version,
+    version.to_int64(),
+    @c.null(),
+  ).to_int()
 }
 
 ///|
 pub fn Ssl::get_min_proto_version(ssl : Ssl) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_get_min_proto_version)(ssl)
+  (api.ssl_ctrl)(ssl, ssl_ctrl_get_min_proto_version, 0L, @c.null()).to_int()
 }
 
 ///|
 pub fn Ssl::get_max_proto_version(ssl : Ssl) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.ssl_get_max_proto_version)(ssl)
+  (api.ssl_ctrl)(ssl, ssl_ctrl_get_max_proto_version, 0L, @c.null()).to_int()
 }
 
 ///|
-pub fn SslCtx::set_options(ctx : SslCtx, options : UInt64) -> UInt64 raise OpenSslError {
+pub fn SslCtx::set_options(
+  ctx : SslCtx,
+  options : UInt64,
+) -> UInt64 raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_ctx_set_options)(ctx, options)
 }
@@ -155,13 +204,19 @@ pub fn SslCtx::get_options(ctx : SslCtx) -> UInt64 raise OpenSslError {
 }
 
 ///|
-pub fn Ssl::set_options(ssl : Ssl, options : UInt64) -> UInt64 raise OpenSslError {
+pub fn Ssl::set_options(
+  ssl : Ssl,
+  options : UInt64,
+) -> UInt64 raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_set_options)(ssl, options)
 }
 
 ///|
-pub fn Ssl::clear_options(ssl : Ssl, options : UInt64) -> UInt64 raise OpenSslError {
+pub fn Ssl::clear_options(
+  ssl : Ssl,
+  options : UInt64,
+) -> UInt64 raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_clear_options)(ssl, options)
 }
@@ -173,13 +228,18 @@ pub fn Ssl::get_options(ssl : Ssl) -> UInt64 raise OpenSslError {
 }
 
 ///|
-pub fn SslCtx::set_default_verify_paths(ctx : SslCtx) -> Unit raise OpenSslError {
+pub fn SslCtx::set_default_verify_paths(
+  ctx : SslCtx,
+) -> Unit raise OpenSslError {
   let api = ensure_openssl()
   ignore((api.ssl_ctx_set_default_verify_paths)(ctx))
 }
 
 ///|
-pub fn SslCtx::set_cipher_list(ctx : SslCtx, str : Bytes) -> Int raise OpenSslError {
+pub fn SslCtx::set_cipher_list(
+  ctx : SslCtx,
+  str : Bytes,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
   @c.borrow_bytes(str, ptr => (api.ssl_ctx_set_cipher_list)(ctx, ptr))
 }
@@ -191,7 +251,10 @@ pub fn Ssl::set_cipher_list(ssl : Ssl, str : Bytes) -> Int raise OpenSslError {
 }
 
 ///|
-pub fn SslCtx::set_ciphersuites(ctx : SslCtx, str : Bytes) -> Int raise OpenSslError {
+pub fn SslCtx::set_ciphersuites(
+  ctx : SslCtx,
+  str : Bytes,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
   @c.borrow_bytes(str, ptr => (api.ssl_ctx_set_ciphersuites)(ctx, ptr))
 }
@@ -203,13 +266,19 @@ pub fn Ssl::set_ciphersuites(ssl : Ssl, str : Bytes) -> Int raise OpenSslError {
 }
 
 ///|
-pub fn SslCtx::use_certificate(ctx : SslCtx, cert : X509) -> Int raise OpenSslError {
+pub fn SslCtx::use_certificate(
+  ctx : SslCtx,
+  cert : X509,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_ctx_use_certificate)(ctx, cert)
 }
 
 ///|
-pub fn SslCtx::use_PrivateKey(ctx : SslCtx, key : EvpPkey) -> Int raise OpenSslError {
+pub fn SslCtx::use_PrivateKey(
+  ctx : SslCtx,
+  key : EvpPkey,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_ctx_use_private_key)(ctx, key)
 }
@@ -236,10 +305,28 @@ pub fn Ssl::set_fd(self : Ssl, fd : Int) -> Int raise OpenSslError {
   (api.ssl_set_fd)(self, fd)
 }
 
+// SSL_CTRL_SET_TLSEXT_HOSTNAME = 55, TLSEXT_NAMETYPE_host_name = 0
+
 ///|
-pub fn Ssl::set_tlsext_host_name(self : Ssl, name : Bytes) -> Int raise OpenSslError {
+let ssl_ctrl_set_tlsext_hostname : Int = 55
+
+///|
+let tlsext_nametype_host_name : Int64 = 0L
+
+///|
+pub fn Ssl::set_tlsext_host_name(
+  self : Ssl,
+  name : Bytes,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  @c.borrow_bytes(name, ptr => (api.ssl_set_tlsext_host_name)(self, ptr))
+  @c.borrow_bytes(name, fn(ptr) {
+    (api.ssl_ctrl)(
+      self,
+      ssl_ctrl_set_tlsext_hostname,
+      tlsext_nametype_host_name,
+      ptr.cast(),
+    ).to_int()
+  })
 }
 
 ///|
@@ -467,7 +554,10 @@ pub fn X509Store::free(store : X509Store) -> Unit raise OpenSslError {
 }
 
 ///|
-pub fn X509Store::add_cert(store : X509Store, cert : X509) -> Int raise OpenSslError {
+pub fn X509Store::add_cert(
+  store : X509Store,
+  cert : X509,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
   (api.x509_store_add_cert)(store, cert)
 }
@@ -524,9 +614,9 @@ pub fn SslCtx::use_PrivateKey_file(
     Asn1 => 2
     Default => 3
   }
-  @c.borrow_bytes(file, ptr =>
-    (api.ssl_ctx_use_private_key_file)(ctx, ptr, type_val)
-  )
+  @c.borrow_bytes(file, ptr => (api.ssl_ctx_use_private_key_file)(
+    ctx, ptr, type_val,
+  ))
 }
 
 ///|
@@ -541,9 +631,9 @@ pub fn SslCtx::use_certificate_file(
     Asn1 => 2
     Default => 3
   }
-  @c.borrow_bytes(file, ptr =>
-    (api.ssl_ctx_use_certificate_file)(ctx, ptr, type_val)
-  )
+  @c.borrow_bytes(file, ptr => (api.ssl_ctx_use_certificate_file)(
+    ctx, ptr, type_val,
+  ))
 }
 
 ///|
@@ -585,12 +675,10 @@ pub fn Bio::read_ex(
   readbytes : Ref[UInt64],
 ) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  @c.borrow_bytes(data, ptr =>
-    @c.borrow_ref(readbytes, out_ptr => {
-      let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
-      (api.bio_read_ex)(bio, data_ptr, length, out_ptr)
-    })
-  )
+  @c.borrow_bytes(data, ptr => @c.borrow_ref(readbytes, out_ptr => {
+    let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
+    (api.bio_read_ex)(bio, data_ptr, length, out_ptr)
+  }))
 }
 
 ///|
@@ -616,31 +704,50 @@ pub fn Bio::write_ex(
   written : Ref[UInt64],
 ) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  @c.borrow_bytes(data, ptr =>
-    @c.borrow_ref(written, out_ptr => {
-      let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
-      (api.bio_write_ex)(bio, data_ptr, length, out_ptr)
-    })
-  )
+  @c.borrow_bytes(data, ptr => @c.borrow_ref(written, out_ptr => {
+    let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
+    (api.bio_write_ex)(bio, data_ptr, length, out_ptr)
+  }))
 }
 
 ///|
-pub fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int raise OpenSslError {
+pub fn Ssl::set_bio(
+  ssl : Ssl,
+  rbio : Bio,
+  wbio : Bio,
+) -> Int raise OpenSslError {
   let api = ensure_openssl()
   (api.ssl_set_bio)(ssl, rbio, wbio)
   1
 }
 
+// BIO_CTRL constants (from OpenSSL bio.h)
+
+///|
+let bio_ctrl_reset : Int = 1
+
+///|
+let bio_ctrl_eof : Int = 2
+
+///|
+let bio_ctrl_pending : Int = 10
+
+///|
+let bio_ctrl_flush : Int = 11
+
+///|
+let bio_ctrl_wpending : Int = 13
+
 ///|
 pub fn Bio::pending(bio : Bio) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.bio_pending)(bio)
+  (api.bio_ctrl)(bio, bio_ctrl_pending, 0L, @c.null()).to_int()
 }
 
 ///|
 pub fn Bio::wpending(bio : Bio) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.bio_wpending)(bio)
+  (api.bio_ctrl)(bio, bio_ctrl_wpending, 0L, @c.null()).to_int()
 }
 
 ///|
@@ -658,37 +765,19 @@ pub fn Bio::ctrl_wpending(bio : Bio) -> UInt64 raise OpenSslError {
 ///|
 pub fn Bio::reset(bio : Bio) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.bio_reset)(bio)
+  (api.bio_ctrl)(bio, bio_ctrl_reset, 0L, @c.null()).to_int()
 }
 
 ///|
 pub fn Bio::flush(bio : Bio) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.bio_flush)(bio)
+  (api.bio_ctrl)(bio, bio_ctrl_flush, 0L, @c.null()).to_int()
 }
 
 ///|
 pub fn Bio::eof(bio : Bio) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  (api.bio_eof)(bio)
-}
-
-///|
-pub fn Bio::set_tfo(bio : Bio, onoff : Int) -> Int raise OpenSslError {
-  let api = ensure_openssl()
-  (api.bio_set_tfo)(bio, onoff)
-}
-
-///|
-pub fn Bio::get_conn_mode(bio : Bio) -> Int raise OpenSslError {
-  let api = ensure_openssl()
-  (api.bio_get_conn_mode)(bio)
-}
-
-///|
-pub fn Bio::set_conn_mode(bio : Bio, mode : Int) -> Int raise OpenSslError {
-  let api = ensure_openssl()
-  (api.bio_set_conn_mode)(bio, mode)
+  (api.bio_ctrl)(bio, bio_ctrl_eof, 0L, @c.null()).to_int()
 }
 
 ///|
@@ -708,7 +797,11 @@ pub fn Err::peek_error() -> UInt64 raise OpenSslError {
 }
 
 ///|
-pub fn Err::error_string_n(err : UInt64, buf : Bytes, len : Int) -> Unit raise OpenSslError {
+pub fn Err::error_string_n(
+  err : UInt64,
+  buf : Bytes,
+  len : Int,
+) -> Unit raise OpenSslError {
   let api = ensure_openssl()
   @c.borrow_bytes(buf, ptr => (api.err_error_string_n)(err, ptr, len))
 }

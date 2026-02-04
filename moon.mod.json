@@ -3,7 +3,10 @@
   "version": "0.2.3",
   "deps": {
     "tonyfettes/c": "0.7.4",
-    "tonyfettes/dl": "0.1.0"
+    "tonyfettes/dl": "0.1.1",
+    "tonyfettes/os": "0.1.0",
+    "tonyfettes/platform": "0.1.0",
+    "moonbitlang/x": "0.4.40"
   },
   "readme": "README.md",
   "repository": "https://github.com/moonbit-community/openssl.mbt",
@@ -19,6 +22,6 @@
     ".moonagent",
     ".env"
   ],
-  "--moonbit-unstable-prebuild": "build.py",
-  "preferred-target": "native"
+  "preferred-target": "native",
+  "--moonbit-unstable-prebuild": "build.py"
 }

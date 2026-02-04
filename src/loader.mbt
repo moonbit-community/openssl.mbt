@@ -17,14 +17,8 @@ priv struct OpenSsl {
   ssl_ctx_new : FuncRef[(SslMethod) -> SslCtx]
   ssl_ctx_set_cert_store : FuncRef[(SslCtx, X509Store) -> Unit]
   ssl_ctx_set_verify : FuncRef[(SslCtx, Int) -> Unit]
-  ssl_ctx_set_min_proto_version : FuncRef[(SslCtx, Int) -> Int]
-  ssl_ctx_set_max_proto_version : FuncRef[(SslCtx, Int) -> Int]
-  ssl_ctx_get_min_proto_version : FuncRef[(SslCtx) -> Int]
-  ssl_ctx_get_max_proto_version : FuncRef[(SslCtx) -> Int]
-  ssl_set_min_proto_version : FuncRef[(Ssl, Int) -> Int]
-  ssl_set_max_proto_version : FuncRef[(Ssl, Int) -> Int]
-  ssl_get_min_proto_version : FuncRef[(Ssl) -> Int]
-  ssl_get_max_proto_version : FuncRef[(Ssl) -> Int]
+  ssl_ctx_ctrl : FuncRef[(SslCtx, Int, Int64, @c.Pointer[Unit]) -> Int64]
+  ssl_ctrl : FuncRef[(Ssl, Int, Int64, @c.Pointer[Unit]) -> Int64]
   ssl_ctx_set_options : FuncRef[(SslCtx, UInt64) -> UInt64]
   ssl_ctx_clear_options : FuncRef[(SslCtx, UInt64) -> UInt64]
   ssl_ctx_get_options : FuncRef[(SslCtx) -> UInt64]
@@ -41,7 +35,6 @@ priv struct OpenSsl {
   ssl_ctx_free : FuncRef[(SslCtx) -> Unit]
   ssl_new : FuncRef[(SslCtx) -> Ssl]
   ssl_set_fd : FuncRef[(Ssl, Int) -> Int]
-  ssl_set_tlsext_host_name : FuncRef[(Ssl, @c.Pointer[Byte]) -> Int]
   ssl_set1_host : FuncRef[(Ssl, @c.Pointer[Byte]) -> Int]
   ssl_set_accept_state : FuncRef[(Ssl) -> Unit]
   ssl_do_handshake : FuncRef[(Ssl) -> Int]
@@ -82,16 +75,9 @@ priv struct OpenSsl {
   bio_write_ex : FuncRef[
     (Bio, @c.Pointer[Byte], UInt64, @c.Pointer[UInt64]) -> Int,
   ]
-  bio_pending : FuncRef[(Bio) -> Int]
-  bio_wpending : FuncRef[(Bio) -> Int]
+  bio_ctrl : FuncRef[(Bio, Int, Int64, @c.Pointer[Unit]) -> Int64]
   bio_ctrl_pending : FuncRef[(Bio) -> UInt64]
   bio_ctrl_wpending : FuncRef[(Bio) -> UInt64]
-  bio_reset : FuncRef[(Bio) -> Int]
-  bio_flush : FuncRef[(Bio) -> Int]
-  bio_eof : FuncRef[(Bio) -> Int]
-  bio_set_tfo : FuncRef[(Bio, Int) -> Int]
-  bio_get_conn_mode : FuncRef[(Bio) -> Int]
-  bio_set_conn_mode : FuncRef[(Bio, Int) -> Int]
   err_get_error : FuncRef[() -> UInt64]
   err_peek_error : FuncRef[() -> UInt64]
   err_error_string_n : FuncRef[(UInt64, @c.Pointer[Byte], Int) -> Unit]
@@ -132,9 +118,6 @@ fn build_paths(names : Array[String]) -> Array[String] raise {
     for name in names {
       paths.push(@path.Path(dir).join(name).to_string())
     }
-  }
-  for name in names {
-    paths.push(name)
   }
   match @env.current_dir() {
     None => ()
@@ -235,43 +218,13 @@ fn load() -> OpenSsl raise OpenSslError {
   ) catch {
     error => raise SymbolMissing(error)
   }
-  let ssl_ctx_set_min_proto_version : FuncRef[(SslCtx, Int) -> Int] = dl_ssl.funcref(
-    "SSL_CTX_set_min_proto_version",
+  let ssl_ctx_ctrl : FuncRef[(SslCtx, Int, Int64, @c.Pointer[Unit]) -> Int64] = dl_ssl.funcref(
+    "SSL_CTX_ctrl",
   ) catch {
     error => raise SymbolMissing(error)
   }
-  let ssl_ctx_set_max_proto_version : FuncRef[(SslCtx, Int) -> Int] = dl_ssl.funcref(
-    "SSL_CTX_set_max_proto_version",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_ctx_get_min_proto_version : FuncRef[(SslCtx) -> Int] = dl_ssl.funcref(
-    "SSL_CTX_get_min_proto_version",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_ctx_get_max_proto_version : FuncRef[(SslCtx) -> Int] = dl_ssl.funcref(
-    "SSL_CTX_get_max_proto_version",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_set_min_proto_version : FuncRef[(Ssl, Int) -> Int] = dl_ssl.funcref(
-    "SSL_set_min_proto_version",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_set_max_proto_version : FuncRef[(Ssl, Int) -> Int] = dl_ssl.funcref(
-    "SSL_set_max_proto_version",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_get_min_proto_version : FuncRef[(Ssl) -> Int] = dl_ssl.funcref(
-    "SSL_get_min_proto_version",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_get_max_proto_version : FuncRef[(Ssl) -> Int] = dl_ssl.funcref(
-    "SSL_get_max_proto_version",
+  let ssl_ctrl : FuncRef[(Ssl, Int, Int64, @c.Pointer[Unit]) -> Int64] = dl_ssl.funcref(
+    "SSL_ctrl",
   ) catch {
     error => raise SymbolMissing(error)
   }
@@ -347,11 +300,6 @@ fn load() -> OpenSsl raise OpenSslError {
     error => raise SymbolMissing(error)
   }
   let ssl_set_fd : FuncRef[(Ssl, Int) -> Int] = dl_ssl.funcref("SSL_set_fd") catch {
-    error => raise SymbolMissing(error)
-  }
-  let ssl_set_tlsext_host_name : FuncRef[(Ssl, @c.Pointer[Byte]) -> Int] = dl_ssl.funcref(
-    "SSL_set_tlsext_host_name",
-  ) catch {
     error => raise SymbolMissing(error)
   }
   let ssl_set1_host : FuncRef[(Ssl, @c.Pointer[Byte]) -> Int] = dl_ssl.funcref(
@@ -516,10 +464,9 @@ fn load() -> OpenSsl raise OpenSslError {
   ] = dl_crypto.funcref("BIO_write_ex") catch {
     error => raise SymbolMissing(error)
   }
-  let bio_pending : FuncRef[(Bio) -> Int] = dl_crypto.funcref("BIO_pending") catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_wpending : FuncRef[(Bio) -> Int] = dl_crypto.funcref("BIO_wpending") catch {
+  let bio_ctrl : FuncRef[(Bio, Int, Int64, @c.Pointer[Unit]) -> Int64] = dl_crypto.funcref(
+    "BIO_ctrl",
+  ) catch {
     error => raise SymbolMissing(error)
   }
   let bio_ctrl_pending : FuncRef[(Bio) -> UInt64] = dl_crypto.funcref(
@@ -529,30 +476,6 @@ fn load() -> OpenSsl raise OpenSslError {
   }
   let bio_ctrl_wpending : FuncRef[(Bio) -> UInt64] = dl_crypto.funcref(
     "BIO_ctrl_wpending",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_reset : FuncRef[(Bio) -> Int] = dl_crypto.funcref("BIO_reset") catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_flush : FuncRef[(Bio) -> Int] = dl_crypto.funcref("BIO_flush") catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_eof : FuncRef[(Bio) -> Int] = dl_crypto.funcref("BIO_eof") catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_set_tfo : FuncRef[(Bio, Int) -> Int] = dl_crypto.funcref(
-    "BIO_set_tfo",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_get_conn_mode : FuncRef[(Bio) -> Int] = dl_crypto.funcref(
-    "BIO_get_conn_mode",
-  ) catch {
-    error => raise SymbolMissing(error)
-  }
-  let bio_set_conn_mode : FuncRef[(Bio, Int) -> Int] = dl_crypto.funcref(
-    "BIO_set_conn_mode",
   ) catch {
     error => raise SymbolMissing(error)
   }
@@ -578,14 +501,8 @@ fn load() -> OpenSsl raise OpenSslError {
     ssl_ctx_new,
     ssl_ctx_set_cert_store,
     ssl_ctx_set_verify,
-    ssl_ctx_set_min_proto_version,
-    ssl_ctx_set_max_proto_version,
-    ssl_ctx_get_min_proto_version,
-    ssl_ctx_get_max_proto_version,
-    ssl_set_min_proto_version,
-    ssl_set_max_proto_version,
-    ssl_get_min_proto_version,
-    ssl_get_max_proto_version,
+    ssl_ctx_ctrl,
+    ssl_ctrl,
     ssl_ctx_set_options,
     ssl_ctx_clear_options,
     ssl_ctx_get_options,
@@ -602,7 +519,6 @@ fn load() -> OpenSsl raise OpenSslError {
     ssl_ctx_free,
     ssl_new,
     ssl_set_fd,
-    ssl_set_tlsext_host_name,
     ssl_set1_host,
     ssl_set_accept_state,
     ssl_do_handshake,
@@ -639,16 +555,9 @@ fn load() -> OpenSsl raise OpenSslError {
     bio_read_ex,
     bio_write,
     bio_write_ex,
-    bio_pending,
-    bio_wpending,
+    bio_ctrl,
     bio_ctrl_pending,
     bio_ctrl_wpending,
-    bio_reset,
-    bio_flush,
-    bio_eof,
-    bio_set_tfo,
-    bio_get_conn_mode,
-    bio_set_conn_mode,
     err_get_error,
     err_peek_error,
     err_error_string_n,
