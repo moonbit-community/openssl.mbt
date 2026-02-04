@@ -2,17 +2,31 @@
   "targets": {
     "openssl.mbt": ["native"]
   },
-  "link": {
-    "native": {
-      "stub-cc": "${build.CC}",
-      "stub-cc-flags": "${build.CC_FLAGS}"
-    }
-  },
-  "native-stub": [
-    "openssl.c"
-  ],
   "import": [
-    "tonyfettes/c",
+    {
+      "path": "tonyfettes/dl",
+      "alias": "dl"
+    },
+    {
+      "path": "tonyfettes/c",
+      "alias": "c"
+    },
+    {
+      "path": "tonyfettes/platform",
+      "alias": "platform"
+    },
+    {
+      "path": "tonyfettes/os",
+      "alias": "os"
+    },
+    {
+      "path": "moonbitlang/x/path",
+      "alias": "path"
+    },
+    {
+      "path": "moonbitlang/core/env",
+      "alias": "env"
+    },
     "moonbitlang/core/buffer"
   ]
 }

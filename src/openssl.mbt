@@ -5,16 +5,25 @@ pub const INIT_LOAD_SSL_STRINGS : UInt64 = 0x00200000UL
 pub const INIT_LOAD_CRYPTO_STRINGS : UInt64 = 0x00000002UL
 
 ///|
-pub extern "c" fn init_ssl(opts : UInt64) -> Int = "moonbit_OPENSSL_init_ssl"
+pub fn init_ssl(opts : UInt64) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.init_ssl)(opts, @c.null())
+}
 
 ///|
 pub type Tls
 
 ///|
-pub extern "c" fn Tls::client_method() -> SslMethod = "moonbit_TLS_client_method"
+pub fn Tls::client_method() -> SslMethod raise OpenSslError {
+  let api = ensure_openssl()
+  (api.tls_client_method)()
+}
 
 ///|
-pub extern "c" fn Tls::server_method() -> SslMethod = "moonbit_TLS_server_method"
+pub fn Tls::server_method() -> SslMethod raise OpenSslError {
+  let api = ensure_openssl()
+  (api.tls_server_method)()
+}
 
 ///|
 #external
@@ -25,10 +34,16 @@ type SslMethod
 type SslCtx
 
 ///|
-pub extern "c" fn SslCtx::new(method_ : SslMethod) -> SslCtx = "moonbit_SSL_CTX_new"
+pub fn SslCtx::new(method_ : SslMethod) -> SslCtx raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_new)(method_)
+}
 
 ///|
-pub extern "c" fn SslCtx::set_cert_store(ctx : SslCtx, store : X509Store) = "moonbit_SSL_CTX_set_cert_store"
+pub fn SslCtx::set_cert_store(ctx : SslCtx, store : X509Store) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_set_cert_store)(ctx, store)
+}
 
 ///|
 struct SslVerify(Int)
@@ -58,140 +73,244 @@ pub fn SslVerify::peer(
 }
 
 ///|
-pub extern "c" fn SslCtx::set_verify(ctx : SslCtx, mode : SslVerify) = "moonbit_SSL_CTX_set_verify"
+pub fn SslCtx::set_verify(ctx : SslCtx, mode : SslVerify) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  let SslVerify(value) = mode
+  (api.ssl_ctx_set_verify)(ctx, value)
+}
 
 ///|
-pub extern "c" fn SslCtx::set_min_proto_version(
+pub fn SslCtx::set_min_proto_version(
   ctx : SslCtx,
   version : Int,
-) -> Int = "moonbit_SSL_CTX_set_min_proto_version"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_set_min_proto_version)(ctx, version)
+}
 
 ///|
-pub extern "c" fn SslCtx::set_max_proto_version(
+pub fn SslCtx::set_max_proto_version(
   ctx : SslCtx,
   version : Int,
-) -> Int = "moonbit_SSL_CTX_set_max_proto_version"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_set_max_proto_version)(ctx, version)
+}
 
 ///|
-pub extern "c" fn SslCtx::get_min_proto_version(ctx : SslCtx) -> Int = "moonbit_SSL_CTX_get_min_proto_version"
+pub fn SslCtx::get_min_proto_version(ctx : SslCtx) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_get_min_proto_version)(ctx)
+}
 
 ///|
-pub extern "c" fn SslCtx::get_max_proto_version(ctx : SslCtx) -> Int = "moonbit_SSL_CTX_get_max_proto_version"
+pub fn SslCtx::get_max_proto_version(ctx : SslCtx) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_get_max_proto_version)(ctx)
+}
 
 ///|
-pub extern "c" fn Ssl::set_min_proto_version(ssl : Ssl, version : Int) -> Int = "moonbit_SSL_set_min_proto_version"
+pub fn Ssl::set_min_proto_version(ssl : Ssl, version : Int) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_set_min_proto_version)(ssl, version)
+}
 
 ///|
-pub extern "c" fn Ssl::set_max_proto_version(ssl : Ssl, version : Int) -> Int = "moonbit_SSL_set_max_proto_version"
+pub fn Ssl::set_max_proto_version(ssl : Ssl, version : Int) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_set_max_proto_version)(ssl, version)
+}
 
 ///|
-pub extern "c" fn Ssl::get_min_proto_version(ssl : Ssl) -> Int = "moonbit_SSL_get_min_proto_version"
+pub fn Ssl::get_min_proto_version(ssl : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_get_min_proto_version)(ssl)
+}
 
 ///|
-pub extern "c" fn Ssl::get_max_proto_version(ssl : Ssl) -> Int = "moonbit_SSL_get_max_proto_version"
+pub fn Ssl::get_max_proto_version(ssl : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_get_max_proto_version)(ssl)
+}
 
 ///|
-pub extern "c" fn SslCtx::set_options(ctx : SslCtx, options : UInt64) -> UInt64 = "moonbit_SSL_CTX_set_options"
+pub fn SslCtx::set_options(ctx : SslCtx, options : UInt64) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_set_options)(ctx, options)
+}
 
 ///|
-pub extern "c" fn SslCtx::clear_options(
+pub fn SslCtx::clear_options(
   ctx : SslCtx,
   options : UInt64,
-) -> UInt64 = "moonbit_SSL_CTX_clear_options"
+) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_clear_options)(ctx, options)
+}
 
 ///|
-pub extern "c" fn SslCtx::get_options(ctx : SslCtx) -> UInt64 = "moonbit_SSL_CTX_get_options"
+pub fn SslCtx::get_options(ctx : SslCtx) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_get_options)(ctx)
+}
 
 ///|
-pub extern "c" fn Ssl::set_options(ssl : Ssl, options : UInt64) -> UInt64 = "moonbit_SSL_set_options"
+pub fn Ssl::set_options(ssl : Ssl, options : UInt64) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_set_options)(ssl, options)
+}
 
 ///|
-pub extern "c" fn Ssl::clear_options(ssl : Ssl, options : UInt64) -> UInt64 = "moonbit_SSL_clear_options"
+pub fn Ssl::clear_options(ssl : Ssl, options : UInt64) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_clear_options)(ssl, options)
+}
 
 ///|
-pub extern "c" fn Ssl::get_options(ssl : Ssl) -> UInt64 = "moonbit_SSL_get_options"
+pub fn Ssl::get_options(ssl : Ssl) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_get_options)(ssl)
+}
 
 ///|
-pub extern "c" fn SslCtx::set_default_verify_paths(ctx : SslCtx) = "moonbit_SSL_CTX_set_default_verify_paths"
+pub fn SslCtx::set_default_verify_paths(ctx : SslCtx) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  ignore((api.ssl_ctx_set_default_verify_paths)(ctx))
+}
 
 ///|
-#borrow(str)
-pub extern "c" fn SslCtx::set_cipher_list(ctx : SslCtx, str : Bytes) -> Int = "moonbit_SSL_CTX_set_cipher_list"
+pub fn SslCtx::set_cipher_list(ctx : SslCtx, str : Bytes) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(str, ptr => (api.ssl_ctx_set_cipher_list)(ctx, ptr))
+}
 
 ///|
-#borrow(str)
-pub extern "c" fn Ssl::set_cipher_list(ssl : Ssl, str : Bytes) -> Int = "moonbit_SSL_set_cipher_list"
+pub fn Ssl::set_cipher_list(ssl : Ssl, str : Bytes) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(str, ptr => (api.ssl_set_cipher_list)(ssl, ptr))
+}
 
 ///|
-#borrow(str)
-pub extern "c" fn SslCtx::set_ciphersuites(ctx : SslCtx, str : Bytes) -> Int = "moonbit_SSL_CTX_set_ciphersuites"
+pub fn SslCtx::set_ciphersuites(ctx : SslCtx, str : Bytes) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(str, ptr => (api.ssl_ctx_set_ciphersuites)(ctx, ptr))
+}
 
 ///|
-#borrow(str)
-pub extern "c" fn Ssl::set_ciphersuites(ssl : Ssl, str : Bytes) -> Int = "moonbit_SSL_set_ciphersuites"
+pub fn Ssl::set_ciphersuites(ssl : Ssl, str : Bytes) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(str, ptr => (api.ssl_set_ciphersuites)(ssl, ptr))
+}
 
 ///|
-pub extern "c" fn SslCtx::use_certificate(ctx : SslCtx, cert : X509) -> Int = "moonbit_SSL_CTX_use_certificate"
+pub fn SslCtx::use_certificate(ctx : SslCtx, cert : X509) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_use_certificate)(ctx, cert)
+}
 
 ///|
-pub extern "c" fn SslCtx::use_PrivateKey(ctx : SslCtx, key : EvpPkey) -> Int = "moonbit_SSL_CTX_use_PrivateKey"
+pub fn SslCtx::use_PrivateKey(ctx : SslCtx, key : EvpPkey) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_use_private_key)(ctx, key)
+}
 
 ///|
-pub extern "c" fn SslCtx::free(ctx : SslCtx) = "moonbit_SSL_CTX_free"
+pub fn SslCtx::free(ctx : SslCtx) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_ctx_free)(ctx)
+}
 
 ///|
 #external
 type Ssl
 
 ///|
-pub extern "c" fn Ssl::new(ctx : SslCtx) -> Ssl = "moonbit_SSL_new"
+pub fn Ssl::new(ctx : SslCtx) -> Ssl raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_new)(ctx)
+}
 
 ///|
-pub extern "c" fn Ssl::set_fd(self : Ssl, fd : Int) -> Int = "moonbit_SSL_set_fd"
+pub fn Ssl::set_fd(self : Ssl, fd : Int) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_set_fd)(self, fd)
+}
 
 ///|
-#borrow(name)
-pub extern "c" fn Ssl::set_tlsext_host_name(self : Ssl, name : Bytes) -> Int = "moonbit_SSL_set_tlsext_host_name"
+pub fn Ssl::set_tlsext_host_name(self : Ssl, name : Bytes) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(name, ptr => (api.ssl_set_tlsext_host_name)(self, ptr))
+}
 
 ///|
-#borrow(name)
-pub extern "c" fn Ssl::set1_host(self : Ssl, name : Bytes) -> Int = "moonbit_SSL_set1_host"
+pub fn Ssl::set1_host(self : Ssl, name : Bytes) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(name, ptr => (api.ssl_set1_host)(self, ptr))
+}
 
 ///|
-pub extern "c" fn Ssl::set_accept_state(self : Ssl) = "moonbit_SSL_set_accept_state"
+pub fn Ssl::set_accept_state(self : Ssl) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_set_accept_state)(self)
+}
 
 ///|
-pub extern "c" fn Ssl::do_handshake(self : Ssl) -> Int = "moonbit_SSL_do_handshake"
+pub fn Ssl::do_handshake(self : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_do_handshake)(self)
+}
 
 ///|
-pub extern "c" fn Ssl::connect(self : Ssl) -> Int = "moonbit_SSL_connect"
+pub fn Ssl::connect(self : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_connect)(self)
+}
 
 ///|
-pub extern "c" fn Ssl::accept(self : Ssl) -> Int = "moonbit_SSL_accept"
+pub fn Ssl::accept(self : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_accept)(self)
+}
 
 ///|
-pub extern "c" fn Ssl::shutdown(self : Ssl) -> Int = "moonbit_SSL_shutdown"
+pub fn Ssl::shutdown(self : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_shutdown)(self)
+}
 
 ///|
-pub extern "c" fn Ssl::free(self : Ssl) = "moonbit_SSL_free"
+pub fn Ssl::free(self : Ssl) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_free)(self)
+}
 
 ///|
-#borrow(buf)
-pub extern "c" fn Ssl::read(
+pub fn Ssl::read(
   ssl : Ssl,
   buf : Bytes,
   off : Int,
   num : Int,
-) -> Int = "moonbit_SSL_read"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(buf, ptr => {
+    let offset = @c.Size::from_uint64(off.to_uint64())
+    (api.ssl_read)(ssl, ptr.byte_add(offset), num)
+  })
+}
 
 ///|
-#borrow(buf)
-pub extern "c" fn Ssl::write(
+pub fn Ssl::write(
   self : Ssl,
   buf : Bytes,
   off : Int,
   num : Int,
-) -> Int = "moonbit_SSL_write"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(buf, ptr => {
+    let offset = @c.Size::from_uint64(off.to_uint64())
+    (api.ssl_write)(self, ptr.byte_add(offset), num)
+  })
+}
 
 ///|
 pub enum SslError {
@@ -214,14 +333,15 @@ fn init {
 }
 
 ///|
-pub extern "c" fn Ssl::get_error(ssl : Ssl, ret : Int) -> SslError = "moonbit_SSL_get_error"
+pub fn Ssl::get_error(ssl : Ssl, ret : Int) -> SslError raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_get_error)(ssl, ret)
+}
 
 ///|
-extern "c" fn moonbit_SSL_get_version(ssl : Ssl) -> @c.Pointer[Byte] = "moonbit_SSL_get_version"
-
-///|
-pub fn Ssl::get_version(ssl : Ssl) -> Bytes {
-  let ptr = moonbit_SSL_get_version(ssl)
+pub fn Ssl::get_version(ssl : Ssl) -> Bytes raise OpenSslError {
+  let api = ensure_openssl()
+  let ptr = (api.ssl_get_version)(ssl)
   if ptr.is_null() {
     return ""
   }
@@ -233,19 +353,42 @@ pub fn Ssl::get_version(ssl : Ssl) -> Bytes {
 }
 
 ///|
-pub extern "c" fn Ssl::version(ssl : Ssl) -> Int = "moonbit_SSL_version"
+pub fn Ssl::version(ssl : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_version)(ssl)
+}
 
 ///|
-pub extern "c" fn Ssl::client_version(ssl : Ssl) -> Int = "moonbit_SSL_client_version"
+pub fn Ssl::client_version(ssl : Ssl) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_client_version)(ssl)
+}
 
 ///|
-pub extern "c" fn Ssl::get0_peer_certificate(ssl : Ssl) -> X509? = "moonbit_SSL_get0_peer_certificate"
+pub fn Ssl::get0_peer_certificate(ssl : Ssl) -> X509? raise OpenSslError {
+  let api = ensure_openssl()
+  let ptr = (api.ssl_get0_peer_certificate)(ssl)
+  if ptr.is_null() {
+    return None
+  }
+  Some(ptr.unsafe_into())
+}
 
 ///|
-pub extern "c" fn Ssl::get1_peer_certificate(ssl : Ssl) -> X509? = "moonbit_SSL_get1_peer_certificate"
+pub fn Ssl::get1_peer_certificate(ssl : Ssl) -> X509? raise OpenSslError {
+  let api = ensure_openssl()
+  let ptr = (api.ssl_get1_peer_certificate)(ssl)
+  if ptr.is_null() {
+    return None
+  }
+  Some(ptr.unsafe_into())
+}
 
 ///|
-pub extern "c" fn Ssl::get_verify_result(ssl : Ssl) -> Int64 = "moonbit_SSL_get_verify_result"
+pub fn Ssl::get_verify_result(ssl : Ssl) -> Int64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_get_verify_result)(ssl)
+}
 
 ///|
 // X509 Verification Result Constants
@@ -277,57 +420,89 @@ pub const X509_V_ERR_CERT_HAS_EXPIRED : Int64 = 10L
 type X509Store
 
 ///|
-pub extern "c" fn X509Store::new() -> X509Store = "moonbit_X509_STORE_new"
+pub fn X509Store::new() -> X509Store raise OpenSslError {
+  let api = ensure_openssl()
+  (api.x509_store_new)()
+}
 
 ///|
 #external
 type X509
 
 ///|
-pub extern "c" fn X509::free(cert : X509) = "moonbit_X509_free"
+pub fn X509::free(cert : X509) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.x509_free)(cert)
+}
 
 ///|
 #external
 type X509Name
 
 ///|
-pub extern "c" fn X509::get_subject_name(cert : X509) -> X509Name = "moonbit_X509_get_subject_name"
+pub fn X509::get_subject_name(cert : X509) -> X509Name raise OpenSslError {
+  let api = ensure_openssl()
+  (api.x509_get_subject_name)(cert)
+}
 
 ///|
-pub extern "c" fn X509::get_issuer_name(cert : X509) -> X509Name = "moonbit_X509_get_issuer_name"
+pub fn X509::get_issuer_name(cert : X509) -> X509Name raise OpenSslError {
+  let api = ensure_openssl()
+  (api.x509_get_issuer_name)(cert)
+}
 
 ///|
 pub type Pem
 
 ///|
-pub extern "c" fn Pem::read_bio_x509(bio : Bio) -> X509 = "moonbit_PEM_read_bio_X509"
+pub fn Pem::read_bio_x509(bio : Bio) -> X509 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.pem_read_bio_x509)(bio)
+}
 
 ///|
-pub extern "c" fn X509Store::free(store : X509Store) = "moonbit_X509_STORE_free"
+pub fn X509Store::free(store : X509Store) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.x509_store_free)(store)
+}
 
 ///|
-pub extern "c" fn X509Store::add_cert(store : X509Store, cert : X509) -> Int = "moonbit_X509_STORE_add_cert"
+pub fn X509Store::add_cert(store : X509Store, cert : X509) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.x509_store_add_cert)(store, cert)
+}
 
 ///|
 #external
 type Bio
 
 ///|
-#borrow(buf)
-pub extern "c" fn Bio::new_mem_buf(buf : Bytes, len : Int) -> Bio = "moonbit_BIO_new_mem_buf"
+pub fn Bio::new_mem_buf(buf : Bytes, len : Int) -> Bio raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(buf, ptr => (api.bio_new_mem_buf)(ptr, len))
+}
 
 ///|
-pub extern "c" fn Bio::free(bio : Bio) -> Int = "moonbit_BIO_free"
+pub fn Bio::free(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_free)(bio)
+}
 
 ///|
 #external
 type EvpPkey
 
 ///|
-pub extern "c" fn Pem::read_bio_PrivateKey(bio : Bio) -> EvpPkey = "moonbit_PEM_read_bio_PrivateKey"
+pub fn Pem::read_bio_PrivateKey(bio : Bio) -> EvpPkey raise OpenSslError {
+  let api = ensure_openssl()
+  (api.pem_read_bio_private_key)(bio)
+}
 
 ///|
-pub extern "c" fn EvpPkey::free(pkey : EvpPkey) = "moonbit_EVP_PKEY_free"
+pub fn EvpPkey::free(pkey : EvpPkey) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  (api.evp_pkey_free)(pkey)
+}
 
 ///|
 #alias(SslFiletype)
@@ -338,115 +513,205 @@ pub(all) enum X509Filetype {
 }
 
 ///|
-#borrow(file)
-pub extern "c" fn SslCtx::use_PrivateKey_file(
+pub fn SslCtx::use_PrivateKey_file(
   ctx : SslCtx,
   file : Bytes,
   type_ : X509Filetype,
-) -> Int = "moonbit_SSL_CTX_use_PrivateKey_file"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  let type_val = match type_ {
+    Pem => 1
+    Asn1 => 2
+    Default => 3
+  }
+  @c.borrow_bytes(file, ptr =>
+    (api.ssl_ctx_use_private_key_file)(ctx, ptr, type_val)
+  )
+}
 
 ///|
-#borrow(file)
-pub extern "c" fn SslCtx::use_certificate_file(
+pub fn SslCtx::use_certificate_file(
   ctx : SslCtx,
   file : Bytes,
   type_ : X509Filetype,
-) -> Int = "moonbit_SSL_CTX_use_certificate_file"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  let type_val = match type_ {
+    Pem => 1
+    Asn1 => 2
+    Default => 3
+  }
+  @c.borrow_bytes(file, ptr =>
+    (api.ssl_ctx_use_certificate_file)(ctx, ptr, type_val)
+  )
+}
 
 ///|
 #external
 type BioMethod
 
 ///|
-pub extern "c" fn Bio::s_mem() -> BioMethod = "moonbit_BIO_s_mem"
+pub fn Bio::s_mem() -> BioMethod raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_s_mem)()
+}
 
 ///|
-pub extern "c" fn Bio::new(ty : BioMethod) -> Bio = "moonbit_BIO_new"
+pub fn Bio::new(ty : BioMethod) -> Bio raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_new)(ty)
+}
 
 ///|
-#borrow(buf)
-pub extern "c" fn Bio::read(
+pub fn Bio::read(
   bio : Bio,
   buf : Bytes,
   off : Int,
   len : Int,
-) -> Int = "moonbit_BIO_read"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(buf, ptr => {
+    let offset = @c.Size::from_uint64(off.to_uint64())
+    (api.bio_read)(bio, ptr.byte_add(offset), len)
+  })
+}
 
 ///|
-#borrow(data, readbytes)
-pub extern "c" fn Bio::read_ex(
+pub fn Bio::read_ex(
   bio : Bio,
   data : Bytes,
   offset : UInt64,
   length : UInt64,
   readbytes : Ref[UInt64],
-) -> Int = "moonbit_BIO_read_ex"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(data, ptr =>
+    @c.borrow_ref(readbytes, out_ptr => {
+      let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
+      (api.bio_read_ex)(bio, data_ptr, length, out_ptr)
+    })
+  )
+}
 
 ///|
-#borrow(buf)
-pub extern "c" fn Bio::write(
+pub fn Bio::write(
   bio : Bio,
   buf : Bytes,
   off : Int,
   len : Int,
-) -> Int = "moonbit_BIO_write"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(buf, ptr => {
+    let offset = @c.Size::from_uint64(off.to_uint64())
+    (api.bio_write)(bio, ptr.byte_add(offset), len)
+  })
+}
 
 ///|
-#borrow(data, written)
-pub extern "c" fn Bio::write_ex(
+pub fn Bio::write_ex(
   bio : Bio,
   data : Bytes,
   offset : UInt64,
   length : UInt64,
   written : Ref[UInt64],
-) -> Int = "moonbit_BIO_write_ex"
+) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(data, ptr =>
+    @c.borrow_ref(written, out_ptr => {
+      let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
+      (api.bio_write_ex)(bio, data_ptr, length, out_ptr)
+    })
+  )
+}
 
 ///|
-pub extern "c" fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int = "moonbit_SSL_set_bio"
+pub fn Ssl::set_bio(ssl : Ssl, rbio : Bio, wbio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.ssl_set_bio)(ssl, rbio, wbio)
+  1
+}
 
 ///|
-pub extern "c" fn Bio::pending(bio : Bio) -> Int = "moonbit_BIO_pending"
+pub fn Bio::pending(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_pending)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::wpending(bio : Bio) -> Int = "moonbit_BIO_wpending"
+pub fn Bio::wpending(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_wpending)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::ctrl_pending(bio : Bio) -> UInt64 = "moonbit_BIO_ctrl_pending"
+pub fn Bio::ctrl_pending(bio : Bio) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_ctrl_pending)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::ctrl_wpending(bio : Bio) -> UInt64 = "moonbit_BIO_ctrl_wpending"
+pub fn Bio::ctrl_wpending(bio : Bio) -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_ctrl_wpending)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::reset(bio : Bio) -> Int = "moonbit_BIO_reset"
+pub fn Bio::reset(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_reset)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::flush(bio : Bio) -> Int = "moonbit_BIO_flush"
+pub fn Bio::flush(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_flush)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::eof(bio : Bio) -> Int = "moonbit_BIO_eof"
+pub fn Bio::eof(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_eof)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::set_tfo(bio : Bio, onoff : Int) -> Int = "moonbit_BIO_set_tfo"
+pub fn Bio::set_tfo(bio : Bio, onoff : Int) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_set_tfo)(bio, onoff)
+}
 
 ///|
-pub extern "c" fn Bio::get_conn_mode(bio : Bio) -> Int = "moonbit_BIO_get_conn_mode"
+pub fn Bio::get_conn_mode(bio : Bio) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_get_conn_mode)(bio)
+}
 
 ///|
-pub extern "c" fn Bio::set_conn_mode(bio : Bio, mode : Int) -> Int = "moonbit_BIO_set_conn_mode"
+pub fn Bio::set_conn_mode(bio : Bio, mode : Int) -> Int raise OpenSslError {
+  let api = ensure_openssl()
+  (api.bio_set_conn_mode)(bio, mode)
+}
 
 ///|
 #external
 pub type Err
 
 ///|
-pub extern "c" fn Err::get_error() -> UInt64 = "moonbit_ERR_get_error"
+pub fn Err::get_error() -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.err_get_error)()
+}
 
 ///|
-pub extern "c" fn Err::peek_error() -> UInt64 = "moonbit_ERR_peek_error"
+pub fn Err::peek_error() -> UInt64 raise OpenSslError {
+  let api = ensure_openssl()
+  (api.err_peek_error)()
+}
 
 ///|
-#borrow(buf)
-pub extern "c" fn Err::error_string_n(err : UInt64, buf : Bytes, len : Int) = "moonbit_ERR_error_string_n"
+pub fn Err::error_string_n(err : UInt64, buf : Bytes, len : Int) -> Unit raise OpenSslError {
+  let api = ensure_openssl()
+  @c.borrow_bytes(buf, ptr => (api.err_error_string_n)(err, ptr, len))
+}
 
 ///|
 // SSL Protocol Version Constants
