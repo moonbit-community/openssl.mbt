@@ -5,15 +5,15 @@ fn bytes_to_fixed_array_byte(bytes : Bytes) -> FixedArray[Byte] = "%identity"
 fn fixed_array_byte_to_bytes(fixed_array : FixedArray[Byte]) -> Bytes = "%identity"
 
 ///|
-async fn Ssl::send(self : Ssl) -> Unit raise {
+async fn Ssl::send(self : Ssl) -> Unit {
   let len = self.wbio.read(self.bytes, 0, self.bytes.length())
-  self.tcp.send(self.bytes, offset=0, len~)
+  self.tcp.write(self.bytes[:len])
 }
 
 ///|
-async fn Ssl::recv(self : Ssl) -> Unit raise {
+async fn Ssl::recv(self : Ssl) -> Unit {
   let bytes = bytes_to_fixed_array_byte(self.bytes)
-  let len = self.tcp.recv(bytes, offset=0, max_len=bytes.length())
+  let len = self.tcp.read(bytes, offset=0, max_len=bytes.length())
   let bytes = fixed_array_byte_to_bytes(bytes)
   if self.rbio.write(bytes, 0, len) < len {
     fail("Failed to write to SSL BIO")
@@ -22,7 +22,7 @@ async fn Ssl::recv(self : Ssl) -> Unit raise {
 
 ///|
 pub struct Ssl {
-  tcp : @socket.TCP
+  tcp : @socket.Tcp
   ssl : @openssl.Ssl
   rbio : @openssl.Bio
   wbio : @openssl.Bio
@@ -30,7 +30,7 @@ pub struct Ssl {
 }
 
 ///|
-pub fn Ssl::new(ctx : @openssl.SslCtx, tcp : @socket.TCP) -> Ssl raise {
+pub fn Ssl::new(ctx : @openssl.SslCtx, tcp : @socket.Tcp) -> Ssl raise {
   let ssl = @openssl.Ssl::new(ctx)
   let bio_s_mem = @openssl.Bio::s_mem()
   let rbio = @openssl.Bio::new(bio_s_mem)
@@ -43,7 +43,7 @@ pub fn Ssl::new(ctx : @openssl.SslCtx, tcp : @socket.TCP) -> Ssl raise {
 }
 
 ///|
-pub async fn Ssl::connect(self : Ssl) -> Unit raise {
+pub async fn Ssl::connect(self : Ssl) -> Unit {
   loop self.ssl.get_error(self.ssl.connect()) {
     None => ()
     ZeroReturn => ()
@@ -66,7 +66,7 @@ pub async fn Ssl::write_all(
   buffer : Bytes,
   offset : Int,
   length : Int,
-) -> Unit raise {
+) -> Unit {
   let written = self.ssl.write(buffer, offset, length)
   match self.ssl.get_error(written) {
     None => {
@@ -90,7 +90,7 @@ pub async fn Ssl::write_all(
 }
 
 ///|
-pub async fn Ssl::read_all(self : Ssl, buffer : @buffer.T) -> Unit raise {
+pub async fn Ssl::read_all(self : Ssl, buffer : @buffer.Buffer) -> Unit {
   let read = self.ssl.read(self.bytes, 0, self.bytes.length())
   match self.ssl.get_error(read) {
     None => {
@@ -112,7 +112,7 @@ pub async fn Ssl::read_all(self : Ssl, buffer : @buffer.T) -> Unit raise {
 }
 
 ///|
-pub async fn Ssl::accept(self : Ssl) -> Unit raise {
+pub async fn Ssl::accept(self : Ssl) -> Unit {
   match self.ssl.get_error(self.ssl.accept()) {
     None | ZeroReturn => ()
     WantRead => {

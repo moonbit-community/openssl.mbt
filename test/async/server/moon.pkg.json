@@ -6,6 +6,12 @@
     "tonyfettes/openssl",
     "tonyfettes/openssl/test/internal/ssl",
     "TheWaWaR/clap",
-    "tonyfettes/encoding"
+    {
+      "path": "moonbitlang/core/encoding/utf8",
+      "alias": "encoding/utf8"
+    },
+    "moonbitlang/core/strconv",
+    "moonbitlang/core/buffer",
+    "moonbitlang/core/env"
   ]
 }

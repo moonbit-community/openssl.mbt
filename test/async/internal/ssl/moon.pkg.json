@@ -1,6 +1,7 @@
 {
   "import": [
     "moonbitlang/async/socket",
-    "tonyfettes/openssl"
+    "tonyfettes/openssl",
+    "moonbitlang/core/buffer"
   ]
 }
