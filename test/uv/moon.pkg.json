@@ -14,6 +14,7 @@
       "path": "moonbitlang/core/encoding/utf8",
       "alias": "encoding/utf8"
     },
-    "moonbitlang/core/buffer"
+    "moonbitlang/core/buffer",
+    "moonbitlang/core/builtin"
   ]
 }

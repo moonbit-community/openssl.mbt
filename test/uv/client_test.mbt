@@ -55,7 +55,7 @@ fn client_poll_read(
         error => errors.push(error)
       }
     error => {
-      errors.push(Failure("SSL read error: \{error}"))
+      errors.push(@builtin.Failure("SSL read error: \{error}"))
       poll.stop() catch {
         e => errors.push(e)
       }
@@ -112,7 +112,7 @@ fn client_poll_connect(
         error => errors.push(error)
       }
     }
-    error => errors.push(Failure("SSL connect error: \{error}"))
+    error => errors.push(@builtin.Failure("SSL connect error: \{error}"))
   }
 }
 
@@ -240,7 +240,7 @@ fn client_poll_write(
       }
     WantWrite | None => ()
     error => {
-      errors.push(Failure("SSL write error: \{error}"))
+      errors.push(@builtin.Failure("SSL write error: \{error}"))
       poll.stop() catch {
         error => errors.push(error)
       }
@@ -293,7 +293,7 @@ fn client_ssl_write_all(
 fn client_ssl_read_all(
   uv : @uv.Loop,
   ssl : @openssl.Ssl,
-  buf : @buffer.T,
+  buf : @buffer.Buffer,
   poll : @uv.Poll,
 ) -> Unit raise {
   let errors = []
@@ -314,7 +314,7 @@ fn client_ssl_read_all(
         (_, error) => errors.push(error),
       )
     error => {
-      errors.push(Failure("SSL read error: \{error}"))
+      errors.push(@builtin.Failure("SSL read error: \{error}"))
       poll.stop() catch {
         error => errors.push(error)
       }

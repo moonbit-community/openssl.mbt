@@ -66,7 +66,7 @@ fn server_read(
   poll : @uv.Poll,
   events : @uv.PollEvent,
   client : @uv.Tcp,
-  buffer : @buffer.T,
+  buffer : @buffer.Buffer,
   ssl : @openssl.Ssl,
   errors : Array[Error],
 ) -> Unit {
