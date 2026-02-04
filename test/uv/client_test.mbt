@@ -5,12 +5,31 @@ let request : Bytes = "GET / HTTP/1.1\r\nHost: www.example.com\r\nConnection: cl
 fn client_poll_read(
   poll : @uv.Poll,
   ssl : @openssl.Ssl,
-  buffer : @buffer.T,
+  buffer : @buffer.Buffer,
   errors : Array[Error],
 ) -> Unit {
   let bytes = Bytes::make(4096, 0)
-  let read = ssl.read(bytes, 0, bytes.length())
-  match ssl.get_error(read) {
+  let read = match (try? ssl.read(bytes, 0, bytes.length())) {
+    Ok(read) => read
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      return
+    }
+  }
+  let ssl_error = match (try? ssl.get_error(read)) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      return
+    }
+  }
+  match ssl_error {
     None => {
       poll.stop() catch {
         e => errors.push(e)
@@ -48,7 +67,21 @@ fn client_poll_connect(
   ssl : @openssl.Ssl,
   errors : Array[Error],
 ) -> Unit {
-  match ssl.get_error(ssl.connect()) {
+  let connect_result = match (try? ssl.connect()) {
+    Ok(result) => result
+    Err(error) => {
+      errors.push(error)
+      return
+    }
+  }
+  let ssl_error = match (try? ssl.get_error(connect_result)) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      return
+    }
+  }
+  match ssl_error {
     None => {
       println("SSL connect: None")
       poll.stop() catch {
@@ -112,7 +145,7 @@ fn connect_tcp(uv : @uv.Loop, addr : @uv.Sockaddr) -> @uv.Tcp raise @uv.Errno {
 }
 
 ///|
-fn setup_ssl_ctx() -> @openssl.SslCtx {
+fn setup_ssl_ctx() -> @openssl.SslCtx raise {
   let ctx = @openssl.SslCtx::new(@openssl.Tls::client_method())
   ctx.set_default_verify_paths()
   ctx
@@ -170,12 +203,32 @@ fn client_connect_ssl(
 fn client_poll_write(
   poll : @uv.Poll,
   ssl : @openssl.Ssl,
-  buf : @bytes.View,
+  buf : BytesView,
   errors : Array[Error],
 ) -> Unit {
-  let written = ssl.write(buf.data(), buf.start_offset(), buf.length())
+  let written = match
+    (try? ssl.write(buf.data(), buf.start_offset(), buf.length())) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      return
+    }
+  }
   println("SSL write: \{written}")
-  match ssl.get_error(written) {
+  let ssl_error = match (try? ssl.get_error(written)) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      return
+    }
+  }
+  match ssl_error {
     None if written == buf.length() =>
       poll.stop() catch {
         error => errors.push(error)
@@ -194,7 +247,7 @@ fn client_poll_write(
 fn client_ssl_write_all(
   uv : @uv.Loop,
   ssl : @openssl.Ssl,
-  buf : @bytes.View,
+  buf : BytesView,
   poll : @uv.Poll,
 ) -> Unit raise {
   let written = ssl.write(buf.data(), buf.start_offset(), buf.length())
@@ -269,7 +322,7 @@ fn client_ssl_read_all(
 }
 
 ///|
-test {
+fn run_client_test() -> Unit raise {
   let uv = @uv.Loop::new()
   let host : Bytes = "www.example.com"
   let port : Bytes = "443"
@@ -284,19 +337,26 @@ test {
   }
   println("OpenSSL initialized successfully")
   let ctx = setup_ssl_ctx()
-  defer ctx.free()
+  defer ignore(try? ctx.free())
   let poll = @uv.Poll::socket(uv, tcp.os_sock())
   let ssl = client_connect_ssl(uv, ctx, tcp, poll, host)
-  defer ssl.free()
+  defer ignore(try? ssl.free())
   println("SSL connect completed")
   client_ssl_write_all(uv, ssl, request, poll)
   println("SSL write completed")
   let buffer = @buffer.new()
   client_ssl_read_all(uv, ssl, buffer, poll)
-  let string = @encoding.decode_lossy(buffer.contents(), encoding=UTF8)
+  let string = @encoding/utf8.decode_lossy(buffer.contents())
   println("Response: \{string}")
   poll.close(() => ())
   tcp.close(() => ())
   uv.run(Default)
   uv.close()
+}
+
+///|
+test {
+  run_client_test() catch {
+    error => fail("Client SSL test failed: \{error}")
+  }
 }

@@ -10,14 +10,38 @@ fn server_write(
   events : @uv.PollEvent,
   tcp : @uv.Tcp,
   ssl : @openssl.Ssl,
-  bytes : @bytes.View,
+  bytes : BytesView,
   errors : Array[Error],
 ) -> Unit {
   if !events.is_writable() {
     return
   }
-  let written = ssl.write(bytes.data(), bytes.start_offset(), bytes.length())
-  match ssl.get_error(written) {
+  let written = match
+    (try? ssl.write(bytes.data(), bytes.start_offset(), bytes.length())) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      poll.close(() => ())
+      tcp.close(() => ())
+      return
+    }
+  }
+  let ssl_error = match (try? ssl.get_error(written)) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      poll.close(() => ())
+      tcp.close(() => ())
+      return
+    }
+  }
+  match ssl_error {
     None => {
       poll.stop() catch {
         e => errors.push(e)
@@ -48,8 +72,29 @@ fn server_read(
     return
   }
   let bytes = Bytes::make(4096, 0)
-  let read = ssl.read(bytes, 0, bytes.length())
-  match ssl.get_error(read) {
+  let read = match (try? ssl.read(bytes, 0, bytes.length())) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      poll.close(() => ())
+      return
+    }
+  }
+  let ssl_error = match (try? ssl.get_error(read)) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      poll.close(() => ())
+      return
+    }
+  }
+  match ssl_error {
     None => {
       buffer.write_bytesview(bytes[:read])
       let request = buffer.contents()
@@ -80,7 +125,31 @@ fn server_accept(
   ssl : @openssl.Ssl,
   errors : Array[Error],
 ) -> Unit {
-  match ssl.get_error(ssl.accept()) {
+  let accept_result = match (try? ssl.accept()) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      poll.close(() => ())
+      tcp.close(() => ())
+      return
+    }
+  }
+  let ssl_error = match (try? ssl.get_error(accept_result)) {
+    Ok(value) => value
+    Err(error) => {
+      errors.push(error)
+      poll.stop() catch {
+        e => errors.push(e)
+      }
+      poll.close(() => ())
+      tcp.close(() => ())
+      return
+    }
+  }
+  match ssl_error {
     None =>
       poll.start(
         @uv.PollEvent::readable(),
@@ -135,7 +204,7 @@ fn server_on_connection(
     let client = @uv.Tcp::new(uv)
     @uv.accept(server, client)
     println(
-      "Accepted connection from \{@encoding.decode_lossy(client.getpeername().ip_name(), encoding=UTF8)}",
+      "Accepted connection from \{@encoding/utf8.decode_lossy(client.getpeername().ip_name())}",
     )
     let ssl = @openssl.Ssl::new(ssl_ctx)
     if ssl.set_fd(client.os_sock().to_int()) != 1 {
@@ -156,7 +225,7 @@ fn server_on_connection(
 }
 
 ///|
-test {
+fn run_server_test() -> Unit raise {
   let uv = @uv.Loop::new()
   let errors : Array[Error] = []
   if @openssl.init_ssl(
@@ -168,7 +237,7 @@ test {
   }
   let server_method = @openssl.Tls::server_method()
   let ctx = @openssl.SslCtx::new(server_method)
-  defer ctx.free()
+  defer ignore(try? ctx.free())
   println("OpenSSL initialized successfully")
   if ctx.use_certificate_file("server.crt", @openssl.X509Filetype::Pem) != 1 {
     println("Failed to load server certificate")
@@ -194,4 +263,11 @@ test {
     println("Error: \{error}")
   }
   uv.close()
+}
+
+///|
+test {
+  run_server_test() catch {
+    error => fail("Server SSL test failed: \{error}")
+  }
 }

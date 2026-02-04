@@ -2,15 +2,15 @@
   "name": "tonyfettes/openssl/test",
   "version": "0.1.0",
   "deps": {
-    "tonyfettes/uv": "0.12.2",
+    "tonyfettes/uv": "0.12.11",
     "tonyfettes/openssl": {
       "path": "../.."
-    },
-    "tonyfettes/encoding": "0.3.6"
+    }
   },
   "readme": "README.md",
   "repository": "",
   "license": "Apache-2.0",
   "keywords": [],
-  "description": ""
+  "description": "",
+  "preferred-target": "native"
 }
