@@ -626,9 +626,9 @@ pub fn SslCtx::use_PrivateKey_file(
     Asn1 => 2
     Default => 3
   }
-  @c.borrow_bytes(file, ptr => (api.ssl_ctx_use_private_key_file)(
-    ctx, ptr, type_val,
-  ))
+  @c.borrow_bytes(file, ptr => {
+    (api.ssl_ctx_use_private_key_file)(ctx, ptr, type_val)
+  })
 }
 
 ///|
@@ -643,9 +643,9 @@ pub fn SslCtx::use_certificate_file(
     Asn1 => 2
     Default => 3
   }
-  @c.borrow_bytes(file, ptr => (api.ssl_ctx_use_certificate_file)(
-    ctx, ptr, type_val,
-  ))
+  @c.borrow_bytes(file, ptr => {
+    (api.ssl_ctx_use_certificate_file)(ctx, ptr, type_val)
+  })
 }
 
 ///|
@@ -687,10 +687,12 @@ pub fn Bio::read_ex(
   readbytes : Ref[UInt64],
 ) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  @c.borrow_bytes(data, ptr => @c.borrow_ref(readbytes, out_ptr => {
-    let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
-    (api.bio_read_ex)(bio, data_ptr, length, out_ptr)
-  }))
+  @c.borrow_bytes(data, ptr => {
+    @c.borrow_ref(readbytes, out_ptr => {
+      let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
+      (api.bio_read_ex)(bio, data_ptr, length, out_ptr)
+    })
+  })
 }
 
 ///|
@@ -716,10 +718,12 @@ pub fn Bio::write_ex(
   written : Ref[UInt64],
 ) -> Int raise OpenSslError {
   let api = ensure_openssl()
-  @c.borrow_bytes(data, ptr => @c.borrow_ref(written, out_ptr => {
-    let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
-    (api.bio_write_ex)(bio, data_ptr, length, out_ptr)
-  }))
+  @c.borrow_bytes(data, ptr => {
+    @c.borrow_ref(written, out_ptr => {
+      let data_ptr = ptr.byte_add(@c.Size::from_uint64(offset))
+      (api.bio_write_ex)(bio, data_ptr, length, out_ptr)
+    })
+  })
 }
 
 ///|
