@@ -5,7 +5,23 @@
 suberror OpenSslError {
   LoadFailed(String)
   SymbolMissing(@dl.DynamicLibraryError)
-} derive(Show)
+}
+
+///|
+pub impl Show for OpenSslError with output(self, logger) {
+  match self {
+    LoadFailed(message) => {
+      logger.write_string("LoadFailed(")
+      logger.write_object(message)
+      logger.write_string(")")
+    }
+    SymbolMissing(error) => {
+      logger.write_string("SymbolMissing(")
+      logger.write_object(error)
+      logger.write_string(")")
+    }
+  }
+}
 
 ///|
 priv struct OpenSsl {

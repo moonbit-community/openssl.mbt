@@ -407,7 +407,19 @@ pub enum SslError {
   WantWrite = 3
   Syscall = 5
   Ssl = 1
-} derive(Show)
+}
+
+///|
+pub impl Show for SslError with output(self, logger) {
+  match self {
+    None => logger.write_string("None")
+    ZeroReturn => logger.write_string("ZeroReturn")
+    WantRead => logger.write_string("WantRead")
+    WantWrite => logger.write_string("WantWrite")
+    Syscall => logger.write_string("Syscall")
+    Ssl => logger.write_string("Ssl")
+  }
+}
 
 ///|
 fn init {
