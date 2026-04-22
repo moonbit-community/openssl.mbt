@@ -173,12 +173,14 @@ fn lib_names_crypto() -> Array[String] raise OpenSslError {
 
 ///|
 fn init {
-  @os.atexit(() => match openssl {
-    Ok(openssl) => {
-      ignore(try? openssl.dl_ssl.close())
-      ignore(try? openssl.dl_crypto.close())
+  @os.atexit(() => {
+    match openssl {
+      Ok(openssl) => {
+        ignore(try? openssl.dl_ssl.close())
+        ignore(try? openssl.dl_crypto.close())
+      }
+      _ => ()
     }
-    _ => ()
   })
 }
 

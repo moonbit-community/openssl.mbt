@@ -1,0 +1,13 @@
+import {
+  "tonyfettes/dl" @dl,
+  "tonyfettes/c" @c,
+  "tonyfettes/platform" @platform,
+  "tonyfettes/os" @os,
+  "moonbitlang/x/path" @path,
+  "moonbitlang/core/env" @env,
+  "moonbitlang/core/buffer",
+}
+
+options(
+  targets: { "openssl.mbt": [ "native" ] },
+)
