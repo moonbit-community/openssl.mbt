@@ -442,7 +442,7 @@ pub fn Ssl::get_version(ssl : Ssl) -> Bytes raise OpenSslError {
   let api = ensure_openssl()
   let ptr = (api.ssl_get_version)(ssl)
   if ptr.is_null() {
-    return ""
+    return b""
   }
   let buffer = @buffer.new()
   for i = 0; ptr[i] != 0; i = i + 1 {
