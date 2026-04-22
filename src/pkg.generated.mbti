@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "tonyfettes/openssl"
 
+import {
+  "moonbitlang/core/ref",
+}
+
 // Values
 pub const BIO_SOCK_KEEPALIVE : Int = 0x04
 
@@ -131,19 +135,16 @@ pub fn Bio::ctrl_wpending(Self) -> UInt64 raise OpenSslError
 pub fn Bio::eof(Self) -> Int raise OpenSslError
 pub fn Bio::flush(Self) -> Int raise OpenSslError
 pub fn Bio::free(Self) -> Int raise OpenSslError
-pub fn Bio::get_conn_mode(Self) -> Int raise OpenSslError
 pub fn Bio::new(BioMethod) -> Self raise OpenSslError
 pub fn Bio::new_mem_buf(Bytes, Int) -> Self raise OpenSslError
 pub fn Bio::pending(Self) -> Int raise OpenSslError
 pub fn Bio::read(Self, Bytes, Int, Int) -> Int raise OpenSslError
-pub fn Bio::read_ex(Self, Bytes, UInt64, UInt64, Ref[UInt64]) -> Int raise OpenSslError
+pub fn Bio::read_ex(Self, Bytes, UInt64, UInt64, @ref.Ref[UInt64]) -> Int raise OpenSslError
 pub fn Bio::reset(Self) -> Int raise OpenSslError
 pub fn Bio::s_mem() -> BioMethod raise OpenSslError
-pub fn Bio::set_conn_mode(Self, Int) -> Int raise OpenSslError
-pub fn Bio::set_tfo(Self, Int) -> Int raise OpenSslError
 pub fn Bio::wpending(Self) -> Int raise OpenSslError
 pub fn Bio::write(Self, Bytes, Int, Int) -> Int raise OpenSslError
-pub fn Bio::write_ex(Self, Bytes, UInt64, UInt64, Ref[UInt64]) -> Int raise OpenSslError
+pub fn Bio::write_ex(Self, Bytes, UInt64, UInt64, @ref.Ref[UInt64]) -> Int raise OpenSslError
 
 type BioMethod
 
