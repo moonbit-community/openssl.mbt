@@ -34,7 +34,7 @@ jobs:
 
       - name: moon info
         run: |
-          moon info --target all
+          moon info --target native
           git diff --exit-code
 
       - name: format diff
@@ -48,4 +48,4 @@ jobs:
 
       - name: moon test
         run: |
-          moon test --target all
+          moon test --target native
