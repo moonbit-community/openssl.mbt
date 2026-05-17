@@ -4,6 +4,7 @@ import {
   "tonyfettes/platform" @platform,
   "tonyfettes/os" @os,
   "moonbitlang/x/path" @path,
+  "moonbitlang/core/debug",
   "moonbitlang/core/env" @env,
   "moonbitlang/core/buffer",
 }

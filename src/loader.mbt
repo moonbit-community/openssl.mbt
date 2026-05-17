@@ -196,14 +196,16 @@ fn load() -> OpenSsl raise OpenSslError {
     Some(dl) => dl
     None =>
       raise LoadFailed(
-        "Could not load libssl library, tried paths: \{ssl_paths}",
+        "Could not load libssl library, tried paths: " +
+        @debug.to_string(ssl_paths),
       )
   }
   let dl_crypto = match load_library(crypto_paths) {
     Some(dl) => dl
     None =>
       raise LoadFailed(
-        "Could not load libcrypto library, tried paths: \{crypto_paths}",
+        "Could not load libcrypto library, tried paths: " +
+        @debug.to_string(crypto_paths),
       )
   }
   let init_ssl : FuncRef[(UInt64, @c.Pointer[Unit]) -> Int] = dl_ssl.funcref(
